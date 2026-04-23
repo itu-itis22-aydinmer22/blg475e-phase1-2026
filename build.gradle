@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'jacoco'
+}
+
+group = 'edu.itu.blg475e'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.11.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = false
+    }
+    ignoreFailures = true
+}
+
+jacoco {
+    toolVersion = '0.8.12'
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = true
+    }
+}
+
+tasks.register('coverageReport') {
+    dependsOn jacocoTestReport
+    doLast {
+        def csv = file("${layout.buildDirectory.get()}/reports/jacoco/test/jacocoTestReport.csv")
+        if (csv.exists()) {
+            println "\n=== JaCoCo Branch Coverage Summary ==="
+            csv.readLines().drop(1).each { line ->
+                def f = line.split(',')
+                def cls = f[2], bMiss = f[5].toInteger(), bHit = f[6].toInteger()
+                def tot = bMiss + bHit
+                def pct = tot == 0 ? 'N/A' : String.format('%.1f%%', 100.0 * bHit / tot)
+                println "  ${cls.padRight(40)} branch=${pct} (${bHit}/${tot})"
+            }
+        }
+    }
+}
