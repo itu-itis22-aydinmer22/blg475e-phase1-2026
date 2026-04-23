@@ -1,0 +1,272 @@
+[
+  {
+    "task_id": "Java/0",
+    "index": 0,
+    "slug": "HE-000_hasCloseElements",
+    "category": "easy",
+    "method_name": "hasCloseElements",
+    "params": "List<Double> numbers, double threshold",
+    "doc": "Check if in given list of numbers, are any two numbers closer to each other than given threshold.\n    >>> hasCloseElements(Arrays.asList(1.0, 2.0, 3.0), 0.5)\n    false\n    >>> hasCloseElements(Arrays.asList(1.0, 2.8, 3.0, 4.0, 5.0, 2.0), 0.3)\n    true"
+  },
+  {
+    "task_id": "Java/3",
+    "index": 3,
+    "slug": "HE-003_belowZero",
+    "category": "moderate",
+    "method_name": "belowZero",
+    "params": "List<Integer> operations",
+    "doc": "You're given a list of deposit and withdrawal operations on a bank account that starts with\n    zero balance. Your task is to detect if at any point the balance of account fallls below zero, and\n    at that point function should return True. Otherwise it should return False.\n    >>> belowZero(Arrays.asList(1, 2, 3))\n    false\n    >>> belowZero(Arrays.asList(1, 2, -4, 5))\n    true"
+  },
+  {
+    "task_id": "Java/7",
+    "index": 7,
+    "slug": "HE-007_filterBySubstring",
+    "category": "easy",
+    "method_name": "filterBySubstring",
+    "params": "List<String> strings, String substring",
+    "doc": "Filter an input list of strings only for ones that contain given substring\n    >>> filterBySubstring(List.of(), \"a\")\n    []\n    >>> filterBySubstring(Arrays.asList(\"abc\", \"bacd\", \"cde\", \"array\"), \"a\")\n    [\"abc\", \"bacd\", \"array\"]"
+  },
+  {
+    "task_id": "Java/9",
+    "index": 9,
+    "slug": "HE-009_rollingMax",
+    "category": "easy",
+    "method_name": "rollingMax",
+    "params": "List<Integer> numbers",
+    "doc": "From a given list of integers, generate a list of rolling maximum element found until given moment\n    in the sequence.\n    >>> rollingMax(Arrays.asList(1, 2, 3, 2, 3, 4, 2))\n    [1, 2, 3, 3, 3, 4, 4]"
+  },
+  {
+    "task_id": "Java/10",
+    "index": 10,
+    "slug": "HE-010_isPalindrome",
+    "category": "hard",
+    "method_name": "isPalindrome",
+    "params": "String string",
+    "doc": "Test if given string is a palindrome"
+  },
+  {
+    "task_id": "Java/11",
+    "index": 11,
+    "slug": "HE-011_stringXor",
+    "category": "moderate",
+    "method_name": "stringXor",
+    "params": "String a, String b",
+    "doc": "Input are two strings a and b consisting only of 1s and 0s.\n    Perform binary XOR on these inputs and return result also as a string.\n    >>> stringXor(\"010\", \"110\")\n    \"100\""
+  },
+  {
+    "task_id": "Java/12",
+    "index": 12,
+    "slug": "HE-012_longest",
+    "category": "easy",
+    "method_name": "longest",
+    "params": "List<String> strings",
+    "doc": "Out of list of strings, return the longest one. Return the first one in case of multiple\n    strings of the same length. Return None in case the input list is empty.\n    >>> longest(List.of())\n    Optional.empty\n    >>> longest(Arrays.asList(\"a\", \"b\", \"c\"))\n    Optional[a]\n    >>> longest(Arrays.asList(\"a\", \"bb\", \"ccc\"))\n    Optional[ccc]"
+  },
+  {
+    "task_id": "Java/14",
+    "index": 14,
+    "slug": "HE-014_allPrefixes",
+    "category": "moderate",
+    "method_name": "allPrefixes",
+    "params": "String string",
+    "doc": "Return list of all prefixes from shortest to longest of the input string\n    >>> allPrefixes(\"abc\")\n    [\"a\", \"ab\", \"abc\"]"
+  },
+  {
+    "task_id": "Java/15",
+    "index": 15,
+    "slug": "HE-015_stringSequence",
+    "category": "moderate",
+    "method_name": "stringSequence",
+    "params": "int n",
+    "doc": "Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n    >>> stringSequence(0)\n    \"0\"\n    >>> stringSequence(5)\n    \"0 1 2 3 4 5\""
+  },
+  {
+    "task_id": "Java/17",
+    "index": 17,
+    "slug": "HE-017_parseMusic",
+    "category": "moderate",
+    "method_name": "parseMusic",
+    "params": "String string",
+    "doc": "Input to this function is a string representing musical notes in a special ASCII format.\n    Your task is to parse this string and return list of integers corresponding to how many beats does each\n    not last.\n\n    Here is a legend:\n    \"o\" - whole note, lasts four beats\n    \"o|\" - half note, lasts two beats\n    \".|\" - quater note, lasts one beat\n\n    >>> parseMusic(\"o o| .| o| o| .| .| .| .| o o\")\n    [4, 2, 1, 2, 2, 1, 1, 1, 1, 4, 4]"
+  },
+  {
+    "task_id": "Java/18",
+    "index": 18,
+    "slug": "HE-018_howManyTimes",
+    "category": "moderate",
+    "method_name": "howManyTimes",
+    "params": "String string, String substring",
+    "doc": "Find how many times a given substring can be found in the original string. Count overlaping cases.\n    >>> howManyTimes(\"\", \"a\")\n    0\n    >>> howManyTimes(\"aaa\", \"a\")\n    3\n    >>> howManyTimes(\"aaaa\", \"aa\")\n    3"
+  },
+  {
+    "task_id": "Java/21",
+    "index": 21,
+    "slug": "HE-021_rescaleToUnit",
+    "category": "easy",
+    "method_name": "rescaleToUnit",
+    "params": "List<Double> numbers",
+    "doc": "Given list of numbers (of at least two elements), apply a linear transform to that list,\n    such that the smallest number will become 0 and the largest will become 1\n    >>> rescaleToUnit(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0))\n    [0.0, 0.25, 0.5, 0.75, 1.0]"
+  },
+  {
+    "task_id": "Java/23",
+    "index": 23,
+    "slug": "HE-023_strlen",
+    "category": "easy",
+    "method_name": "strlen",
+    "params": "String string",
+    "doc": "Return length of given string\n    >>> strlen(\"\")\n    0\n    >>> strlen(\"abc\")\n    3"
+  },
+  {
+    "task_id": "Java/24",
+    "index": 24,
+    "slug": "HE-024_largestDivisor",
+    "category": "easy",
+    "method_name": "largestDivisor",
+    "params": "int n",
+    "doc": "For a given number n, find the largest number that divides n evenly, smaller than n\n    >>> largestDivisor(15)\n    5"
+  },
+  {
+    "task_id": "Java/25",
+    "index": 25,
+    "slug": "HE-025_factorize",
+    "category": "moderate",
+    "method_name": "factorize",
+    "params": "int n",
+    "doc": "Return list of prime factors of given integer in the order from smallest to largest.\n    Each of the factors should be listed number of times corresponding to how many times it appeares in factorization.\n    Input number should be equal to the product of all factors\n    >>> factorize(8)\n    [2, 2, 2]\n    >>> factorize(25)\n    [5, 5]\n    >>> factorize(70)\n    [2, 5, 7]"
+  },
+  {
+    "task_id": "Java/27",
+    "index": 27,
+    "slug": "HE-027_flipCase",
+    "category": "easy",
+    "method_name": "flipCase",
+    "params": "String string",
+    "doc": "For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n    >>> flipCase(\"Hello\")\n    \"hELLO\""
+  },
+  {
+    "task_id": "Java/28",
+    "index": 28,
+    "slug": "HE-028_concatenate",
+    "category": "easy",
+    "method_name": "concatenate",
+    "params": "List<String> strings",
+    "doc": "Concatenate list of strings into a single string\n    >>> concatenate(List.of())\n    \"\"\n    >>> concatenate(Arrays.asList(\"a\", \"b\", \"c\"))\n    \"abc\""
+  },
+  {
+    "task_id": "Java/31",
+    "index": 31,
+    "slug": "HE-031_isPrime",
+    "category": "moderate",
+    "method_name": "isPrime",
+    "params": "int n",
+    "doc": "Return true if a given number is prime, and false otherwise.\n    >>> isPrime(6)\n    false\n    >>> isPrime(101)\n    true\n    >>> isPrime(11)\n    true\n    >>> isPrime(13441)\n    true\n    >>> isPrime(61)\n    true\n    >>> isPrime(4)\n    false\n    >>> isPrime(1)\n    false"
+  },
+  {
+    "task_id": "Java/34",
+    "index": 34,
+    "slug": "HE-034_unique",
+    "category": "moderate",
+    "method_name": "unique",
+    "params": "List<Integer> l",
+    "doc": "Return sorted unique elements in a list\n    >>> unique(Arrays.asList(5, 3, 5, 2, 3, 3, 9, 0, 123))\n    [0, 2, 3, 5, 9, 123]"
+  },
+  {
+    "task_id": "Java/35",
+    "index": 35,
+    "slug": "HE-035_maxElement",
+    "category": "moderate",
+    "method_name": "maxElement",
+    "params": "List<Integer> l",
+    "doc": "Return maximum element in the list.\n    >>> maxElement(Arrays.asList(1, 2, 3))\n    3\n    >>> maxElement(Arrays.asList(5, 3, -5, 2, -3, 3, 9, 0, 123, 1, -10))\n    123"
+  },
+  {
+    "task_id": "Java/40",
+    "index": 40,
+    "slug": "HE-040_triplesSumToZero",
+    "category": "hard",
+    "method_name": "triplesSumToZero",
+    "params": "List<Integer> l",
+    "doc": "triplesSumToZero takes a list of integers as an input.\n    it returns True if there are three distinct elements in the list that\n    sum to zero, and False otherwise.\n\n    >>> triplesSumToZero(Arrays.asList(1, 3, 5, 0))\n    false\n    >>> triplesSumToZero(Arrays.asList(1, 3, -2, 1))\n    true\n    >>> triplesSumToZero(Arrays.asList(1, 2, 3, 7))\n    false\n    >>> triplesSumToZero(Arrays.asList(2, 4, -5, 3, 9, 7))\n    true\n    >>> triplesSumToZero(Arrays.asList(1))\n    false"
+  },
+  {
+    "task_id": "Java/42",
+    "index": 42,
+    "slug": "HE-042_incrList",
+    "category": "easy",
+    "method_name": "incrList",
+    "params": "List<Integer> l",
+    "doc": "Return list with elements incremented by 1.\n    >>> incrList(Arrays.asList(1, 2, 3))\n    [2, 3, 4]\n    >>> incrList(Arrays.asList(5, 3, 5, 2, 3, 3, 9, 0, 123))\n    [6, 4, 6, 3, 4, 4, 10, 1, 124]"
+  },
+  {
+    "task_id": "Java/47",
+    "index": 47,
+    "slug": "HE-047_median",
+    "category": "hard",
+    "method_name": "median",
+    "params": "List<Integer> l",
+    "doc": "Return median of elements in the list l.\n    >>> median(Arrays.asList(3, 1, 2, 4, 5))\n    3\n    >>> median(Arrays.asList(-10, 4, 6, 1000, 10, 20))\n    15.0"
+  },
+  {
+    "task_id": "Java/55",
+    "index": 55,
+    "slug": "HE-055_fib",
+    "category": "hard",
+    "method_name": "fib",
+    "params": "int n",
+    "doc": "Return n-th Fibonacci number.\n    >>> fib(10)\n    55\n    >>> fib(1)\n    1\n    >>> fib(8)\n    21"
+  },
+  {
+    "task_id": "Java/72",
+    "index": 72,
+    "slug": "HE-072_willItFly",
+    "category": "hard",
+    "method_name": "willItFly",
+    "params": "List<Integer> q, int w",
+    "doc": "Write a function that returns True if the object q will fly, and False otherwise.\n    The object q will fly if it's balanced (it is a palindromic list) and the sum of its elements is less than or equal the maximum possible weight w.\n\n    Example:\n    willItFly(Arrays.asList(1, 2), 5) -> false\n    # 1+2 is less than the maximum possible weight, but it's unbalanced.\n\n    willItFly(Arrays.asList(3, 2, 3), 1) -> false\n    # it's balanced, but 3+2+3 is more than the maximum possible weight.\n\n    willItFly(Arrays.asList(3, 2, 3), 9) -> true\n    # 3+2+3 is less than the maximum possible weight, and it's balanced.\n\n    willItFly(Arrays.asList(3), 5) -> true\n    # 3 is less than the maximum possible weight, and it's balanced."
+  },
+  {
+    "task_id": "Java/83",
+    "index": 83,
+    "slug": "HE-083_startsOneEnds",
+    "category": "hard",
+    "method_name": "startsOneEnds",
+    "params": "int n",
+    "doc": "Given a positive integer n, return the count of the numbers of n-digit\n    positive integers that start or end with 1."
+  },
+  {
+    "task_id": "Java/109",
+    "index": 109,
+    "slug": "HE-109_moveOneBall",
+    "category": "hard",
+    "method_name": "moveOneBall",
+    "params": "List<Integer> arr",
+    "doc": "We have an array 'arr' of N integers arr[1], arr[2], ..., arr[N].The\n    numbers in the array will be randomly ordered. Your task is to determine if\n    it is possible to get an array sorted in non-decreasing order by performing\n    the following operation on the given array:\n        You are allowed to perform right shift operation any number of times.\n\n    One right shift operation means shifting all elements of the array by one\n    position in the right direction. The last element of the array will be moved to\n    the starting position in the array i.e. 0th index.\n\n    If it is possible to obtain the sorted array by performing the above operation\n    then return true else return False.\n    If the given array is empty then return true.\n\n    Note: The given list is guaranteed to have unique elements.\n\n    For Example:\n\n    moveOneBall(Arrays.asList(3, 4, 5, 1, 2))==>true\n    Explanation: By performin 2 right shift operations, non-decreasing order can\n                 be achieved for the given array.\n    moveOneBall(Arrays.asList(3, 5, 4, 1, 2))==>False\n    Explanation:It is not possible to get non-decreasing order for the given\n                array by performing any number of right shift operations."
+  },
+  {
+    "task_id": "Java/126",
+    "index": 126,
+    "slug": "HE-126_isSorted",
+    "category": "hard",
+    "method_name": "isSorted",
+    "params": "List<Integer> lst",
+    "doc": "Given a list of numbers, return whether or not they are sorted\n    in ascending order. If list has more than 1 duplicate of the same\n    number, return false. Assume no negative numbers and only integers.\n\n    Examples\n    isSorted(Arrays.asList(5)) -> true\n    isSorted(Arrays.asList(1, 2, 3, 4, 5)) -> true\n    isSorted(Arrays.asList(1, 3, 2, 4, 5)) -> false\n    isSorted(Arrays.asList(1, 2, 3, 4, 5, 6)) -> true\n    isSorted(Arrays.asList(1, 2, 3, 4, 5, 6, 7)) -> true\n    isSorted(Arrays.asList(1, 3, 2, 4, 5, 6, 7)) -> false\n    isSorted(Arrays.asList(1, 2, 2, 3, 3, 4)) -> true\n    isSorted(Arrays.asList(1, 2, 2, 2, 3, 4)) -> false"
+  },
+  {
+    "task_id": "Java/132",
+    "index": 132,
+    "slug": "HE-132_isNested",
+    "category": "hard",
+    "method_name": "isNested",
+    "params": "String string",
+    "doc": "Create a function that takes a string as input which contains only square brackets.\n    The function should return true if and only if there is a valid subsequence of brackets\n    where at least one bracket in the subsequence is nested.\n\n    isNested(\"[[]]\") -> true\n    isNested(\"[]]]]]]][[[[[]\") -> false\n    isNested(\"[][]\") -> false\n    isNested(\"[]\") -> false\n    isNested(\"[[][]]\") -> true\n    isNested(\"[[]][[\") -> true"
+  },
+  {
+    "task_id": "Java/139",
+    "index": 139,
+    "slug": "HE-139_specialFactorial",
+    "category": "hard",
+    "method_name": "specialFactorial",
+    "params": "int n",
+    "doc": "The Brazilian factorial is defined as:\n    brazilian_factorial(n) = n! * (n-1)! * (n-2)! * ... * 1!\n    where n > 0\n\n    For example:\n    >>> specialFactorial(4)\n    288\n\n    The function will receive an integer as input and should return the special\n    factorial of this integer."
+  }
+]

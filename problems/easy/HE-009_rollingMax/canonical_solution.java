@@ -1,0 +1,17 @@
+        List<Integer> result = new ArrayList<>();
+        if (numbers.size() == 0) {
+            return result;
+        }
+        int rollingMax = numbers.get(0);
+        result.add(rollingMax);
+
+        for (int i = 1; i < numbers.size(); i++) {
+            if (numbers.get(i) > rollingMax) {
+                rollingMax = numbers.get(i);
+            }
+            result.add(rollingMax);
+        }
+
+        return result;
+    }
+}
