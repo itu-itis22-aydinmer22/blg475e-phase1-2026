@@ -1,0 +1,220 @@
+\documentclass[journal]{IEEEtran}
+
+% --- Packages ---
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{hyperref}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  captionpos=b,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{gray}
+}
+
+\begin{document}
+
+% ==========================================================================
+\title{Evaluating LLM-Based Code and Test Generation on HumanEval-Java:\\
+A Comparative Study of ChatGPT and Gemini}
+
+\author{\IEEEauthorblockN{<Student 1>, <Student 2>, <Student 3>}\\
+\IEEEauthorblockA{Department of Computer Engineering\\
+Istanbul Technical University\\
+Istanbul, Turkey\\
+\{<ID1>, <ID2>, <ID3>\}@itu.edu.tr}}
+
+\maketitle
+
+% ==========================================================================
+\begin{abstract}
+% TODO (Member B): 150--200 words. Motivate the study, name the two LLMs,
+% describe the 30-problem HumanEval-Java subset, summarise that ChatGPT passed
+% 30/30 and Gemini passed 23/30, and finally state that improved EC/BV tests
+% reached 100\% branch coverage on all branchful ChatGPT classes.
+We evaluate two pre-trained large language models (LLMs) --- OpenAI ChatGPT
+(GPT-4o) and Google Gemini 2.5 Pro --- on a 30-problem subset of the
+HumanEval-Java benchmark. Using a semi-agentic workflow we generate Java
+solutions, convert HumanEval base tests to JUnit 5/6, and author improved
+tests driven by equivalence class partitioning and boundary value analysis.
+We measure correctness using the base and improved suites and branch coverage
+using JaCoCo. ChatGPT produced implementations that passed all 60 of our
+ChatGPT-targeted tests; Gemini produced 23/30 implementations that passed
+every test and 7/30 that diverged from canonical behaviour in ways captured
+by our improved test suite. We discuss the nature of the deviations, assess
+the effectiveness of EC/BV partitioning as a diagnostic, and report branch
+coverage of 122/122 across all ChatGPT classes with conditional branches.
+\end{abstract}
+
+\begin{IEEEkeywords}
+LLM, code generation, test generation, HumanEval, JUnit, branch coverage,
+equivalence class partitioning, boundary value analysis.
+\end{IEEEkeywords}
+
+% ==========================================================================
+\section{Introduction}
+% TODO (Member B): ~0.5 page. Paraphrase the assignment motivation: LLMs can
+% generate code and tests; correctness must be verified; this study does
+% exactly that for Java / HumanEval.
+
+% ==========================================================================
+\section{Related Work}
+\label{sec:related}
+% TODO (Member B): 5 papers, 2023--2026, ~1--1.5 page.
+% The \cite{} entries come from references.bib.
+
+% Paper 1: \cite{paper1} ...
+% Paper 2: \cite{paper2} ...
+% Paper 3: \cite{paper3} ...
+% Paper 4: \cite{paper4} ...
+% Paper 5: \cite{paper5} ...
+
+% ==========================================================================
+\section{Methodology}
+\label{sec:method}
+
+\subsection{LLM Selection Rationale}
+% TODO (Member B). Key points (from WORK_DIVISION.md):
+%   - ChatGPT (GPT-4o) is the industry baseline.
+%   - Gemini 2.5 Pro is Google's flagship alternative; gives vendor diversity.
+%   - Both are publicly accessible without paid research credentials.
+%   - Both expose a plain chat interface --- fits the semi-agentic workflow.
+
+\subsection{Approach: Semi-Agentic vs Agentic}
+% TODO (Member B). Justify the semi-agentic choice: human-in-the-loop keeps
+% prompts identical across both LLMs, which is necessary for a fair comparison.
+% Limitations: doesn't exercise iterative self-correction; slower.
+
+\subsection{Problem Selection}
+We selected 30 problems from the 164-problem HumanEval-Java
+dataset~\cite{humaneval-x} covering three difficulty categories:
+
+\begin{itemize}
+\item \textbf{Easy (10)}: HE-000, 007, 009, 012, 021, 023, 024, 027, 028, 042
+\item \textbf{Moderate (10)}: HE-003, 011, 014, 015, 017, 018, 025, 031, 034, 035
+\item \textbf{Hard (10)}: HE-010, 040, 047, 055, 072, 083, 109, 126, 132, 139
+\end{itemize}
+
+Difficulty was assigned by inspection of the canonical solution complexity:
+easy problems are one-pass linear algorithms on primitives or short strings;
+moderate problems involve multi-branch conditionals or nested loops; hard
+problems require non-trivial invariants, mathematical reasoning, or
+multi-case boundary handling.
+
+\subsection{Code Generation}
+For each problem we issued the identical prompt (see
+\texttt{logs/<llm>/HE-XXX\_codegen.md}) to both LLMs. The response was pasted
+into the source tree without modification, per the assignment's constraint
+at this step.
+
+\subsection{Test Conversion and Improvement}
+HumanEval's base tests are written as a single \texttt{main} that assembles
+a list of boolean assertions. We transliterated each into JUnit 5/6 using
+\texttt{assertTrue} with one assertion per original boolean (see
+\texttt{*BaseTest.java}). Expected values were not changed.
+
+For the improved suite we performed equivalence class partitioning and
+boundary value analysis per problem (see
+Section~\ref{sec:ec-bv-tables} and \texttt{report/equivalence\_classes.md})
+and wrote targeted \texttt{@Test} methods, one per partition or boundary.
+
+\subsection{Coverage Measurement}
+JaCoCo 0.8.12 reports branch coverage; results are summarised in
+Section~\ref{sec:results}.
+
+% ==========================================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Pass Rate Per LLM}
+\begin{table}[h]
+\centering
+\caption{Base and Improved Test Pass Rate}
+\label{tab:pass-rate}
+\begin{tabular}{lccc}
+\toprule
+LLM & Base tests & Improved tests & Total pass \\
+\midrule
+ChatGPT (GPT-4o) & 30/30 & 30/30 & 60/60 \\
+Gemini 2.5 Pro   & 24/30 & 23/30 & 47/60 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Actual numbers from our run: ChatGPT 30/30 & 30/30, Gemini: 24/30 base
+% (HE-000, 040, 072, 083, 132, 139 fail), 23/30 improved (those six plus
+% HE-018 due to divergent empty-substring contract).
+
+\subsection{Branch Coverage}
+Table~\ref{tab:coverage} summarises branch coverage from
+\texttt{jacocoTestReport}. On all ChatGPT classes that contain conditional
+branches, the improved suite reaches 100\% branch coverage. Classes with
+``N/A'' have no conditionals in the canonical solution (e.g.
+\texttt{strlen} is a single \texttt{return} statement).
+
+% TODO (Member B): Import tabular data from
+% report/coverage/coverage_summary.md.
+
+\subsection{Problem-Level Outcomes}
+% TODO (Member B): Summarise which 7 Gemini implementations failed and why,
+% drawing from logs/gemini/HE-*_codegen.md. See the WORK_DIVISION.md
+% description of each bug class.
+
+% ==========================================================================
+\section{Discussion}
+\label{sec:discuss}
+
+\subsection{Nature of Gemini Deviations}
+% TODO (Member B): 1 paragraph per bug class (6 bug classes observed):
+% 1. Missing palindrome check (HE-072 willItFly)
+% 2. Off-by-one in loop bound (HE-040 triplesSumToZero, HE-139 specialFactorial)
+% 3. Incorrect closed-form (HE-083 startsOneEnds)
+% 4. Structural misinterpretation (HE-132 isNested as bracket-count)
+% 5. Stream filter masking equality (HE-000 hasCloseElements)
+% 6. Divergent edge-case contract (HE-018 empty substring)
+
+\subsection{Effectiveness of EC/BV Partitioning}
+% TODO (Member B): Observations:
+%   - HE-132 base test didn't cover the "siblings" partition; improved did.
+%   - HE-018 edge-case contract divergence only surfaced in the improved suite.
+% EC/BV partitioning was therefore strictly stronger than the HumanEval base
+% tests for at least these two problems.
+
+\subsection{Limitations}
+% TODO (Member B): Sample size = 30 problems. Only two LLMs. Semi-agentic
+% (no iterative correction measured). Both LLMs accessed via chat UI, not
+% API, so temperature/seed not controlled.
+
+\subsection{Refactoring Iteration}
+% TODO (Member B): Describe Member C's refactoring log. For each of the 7
+% Gemini failures, how many prompt rounds were needed to converge? What
+% prompt phrasing worked best?
+
+% ==========================================================================
+\section{Conclusion}
+\label{sec:conclude}
+% TODO (Member B): 1 paragraph, summarising findings and pointing to Phase 2.
+
+% ==========================================================================
+\section*{Acknowledgment}
+\label{sec:ack}
+\input{acknowledgments}
+
+% ==========================================================================
+\begin{thebibliography}{00}
+\bibliography{references}
+\bibliographystyle{IEEEtran}
+\end{thebibliography}
+
+\end{document}
