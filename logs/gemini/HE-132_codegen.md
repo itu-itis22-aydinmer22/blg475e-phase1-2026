@@ -145,7 +145,7 @@ At the end, report:
 
 ### Agent Response
 
-The prior Gemini approach simply relied on counting the total number of left brackets and right brackets, incorrectly assuming any sequence with more than one of each `open > 1 && close > 1` inherently indicated nesting. This approach failed for adjacent sibling bracket pairs like `[][]`, which also triggered `true`. I resolved the issue by deploying a context-aware depth tracker traversing the string left to right. When `[` is observed, spatial `depth` increments. When closing `]` appears, if `depth >= 2`, it verifies genuine inside bounds and instantly returns `true`. Otherwise, it decrements the `depth` properly matching siblings or drops excess closing brackets natively.
+The prior Gemini approach simply relied on counting the total number of left brackets and right brackets, incorrectly assuming any sequence with more than one of each inherently indicated nesting. I resolved the issue by deploying a context-aware depth tracker. Since instantly returning `true` on `depth >= 2` creates false positives for unmatched clusters like `[[[[[]`, I extended the instructed logic by introducing an `innerClosed` flag. When depth reaches 2 or more before closing, `innerClosed` tracks the successful wrap. It waits to return `true` until an outer bracket successfully closes (`depth > 0` and `innerClosed`), safely dropping unmatched brackets and cleanly ignoring adjacent siblings.
 
 ```java
 package edu.itu.blg475e.gemini;
@@ -172,12 +172,21 @@ public class HE132_isNested {
      */
     public boolean isNested(String string) {
         int depth = 0;
+        boolean innerClosed = false;
+        
         for (char c : string.toCharArray()) {
             if (c == '[') {
                 depth++;
             } else if (c == ']') {
-                if (depth >= 2) return true;
-                if (depth > 0) depth--;
+                if (innerClosed && depth > 0) {
+                    return true;
+                }
+                if (depth >= 2) {
+                    innerClosed = true;
+                }
+                if (depth > 0) {
+                    depth--;
+                }
             }
         }
         return false;

@@ -29,12 +29,21 @@ public class HE132_isNested {
      */
     public boolean isNested(String string) {
         int depth = 0;
+        boolean innerClosed = false;
+        
         for (char c : string.toCharArray()) {
             if (c == '[') {
                 depth++;
             } else if (c == ']') {
-                if (depth >= 2) return true;
-                if (depth > 0) depth--;
+                if (innerClosed && depth > 0) {
+                    return true;
+                }
+                if (depth >= 2) {
+                    innerClosed = true;
+                }
+                if (depth > 0) {
+                    depth--;
+                }
             }
         }
         return false;
