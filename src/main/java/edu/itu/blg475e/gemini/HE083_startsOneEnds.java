@@ -21,6 +21,11 @@ public class HE083_startsOneEnds {
      */
     public int startsOneEnds(int n) {
         if (n == 1) return 1;
-        return (int) Math.pow(10, n - 1);
+        
+        int result = 18;
+        for (int i = 0; i < n - 2; i++) {
+            result *= 10;
+        }
+        return result;
     }
 }
