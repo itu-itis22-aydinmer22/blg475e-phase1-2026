@@ -33,8 +33,16 @@ public class HE072_willItFly {
      *     # 3 is less than the maximum possible weight, and it's balanced.
      */
     public boolean willItFly(List<Integer> q, int w) {
+        int n = q.size();
+        for (int i = 0; i < n / 2; i++) {
+            if (!q.get(i).equals(q.get(n - 1 - i))) {
+                return false;
+            }
+        }
         int sum = 0;
-        for (int x : q) sum += x;
+        for (int x : q) {
+            sum += x;
+        }
         return sum <= w;
     }
 }

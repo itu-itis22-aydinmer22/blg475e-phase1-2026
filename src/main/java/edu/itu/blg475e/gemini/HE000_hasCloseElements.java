@@ -23,9 +23,13 @@ public class HE000_hasCloseElements {
      *     true
      */
     public boolean hasCloseElements(List<Double> numbers, double threshold) {
-        return numbers.stream()
-                .flatMap(a -> numbers.stream().map(b -> Math.abs(a - b)))
-                .filter(d -> d > 0)
-                .anyMatch(d -> d < threshold);
+        for (int i = 0; i < numbers.size(); i++) {
+            for (int j = i + 1; j < numbers.size(); j++) {
+                if (Math.abs(numbers.get(i) - numbers.get(j)) < threshold) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -25,10 +25,14 @@ public class HE018_howManyTimes {
      *     3
      */
     public int howManyTimes(String string, String substring) {
-        if (substring.isEmpty()) return 0;
+        if (substring.isEmpty()) return string.length() + 1;
+        if (substring.length() > string.length()) return 0;
+        
         int count = 0;
         for (int i = 0; i <= string.length() - substring.length(); i++) {
-            if (string.startsWith(substring, i)) count++;
+            if (string.substring(i, i + substring.length()).equals(substring)) {
+                count++;
+            }
         }
         return count;
     }

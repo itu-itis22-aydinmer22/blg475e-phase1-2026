@@ -29,9 +29,9 @@ public class HE139_specialFactorial {
      */
     public long specialFactorial(int n) {
         long result = 1;
-        for (int i = 1; i < n; i++) {
-            long fact = 1;
-            for (int j = 1; j <= i; j++) fact *= j;
+        long fact = 1;
+        for (int i = 1; i <= n; i++) {
+            fact *= i;
             result *= fact;
         }
         return result;
