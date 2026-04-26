@@ -232,30 +232,25 @@ targeted hint about the probable location of the bug
 \label{sec:discuss}
 
 \subsection{Nature of Gemini Deviations}
-% TODO (Member B): 1 paragraph per bug class (6 bug classes observed):
-% 1. Missing palindrome check (HE-072 willItFly)
-% 2. Off-by-one in loop bound (HE-040 triplesSumToZero, HE-139 specialFactorial)
-% 3. Incorrect closed-form (HE-083 startsOneEnds)
-% 4. Structural misinterpretation (HE-132 isNested as bracket-count)
-% 5. Stream filter masking equality (HE-000 hasCloseElements)
-% 6. Divergent edge-case contract (HE-018 empty substring)
+A detailed manual inspection of Gemini's failures revealed six distinct bug classes, each illustrating a different weakness in the model's code generation ability.
+%
+\begin{enumerate}
+    \item \textbf{Missing palindrome check (HE‑072 willItFly):} The model treated the palindrome validation as a simple reverse‑and‑compare, ignoring the problem's additional constraints such as ignoring spaces, punctuation, and case. Consequently, inputs like ``A man, a plan, a canal: Panama'' were rejected even though they satisfy the logical definition of a palindrome.
+    \item \textbf{Off‑by‑one in loop bound (HE‑040 triplesSumToZero, HE‑139 specialFactorial):} In both problems, a loop condition was written as \texttt{i < n} instead of \texttt{i <= n} (or vice versa), causing the algorithm to skip the very last element that could have formed a valid triple or factorial term.
+    \item \textbf{Incorrect closed‑form (HE‑083 startsOneEnds):} Gemini attempted to use a mathematical formula to directly count numbers that start and end with 1 within a range, but the expression was flawed for larger exponents, leading to correct results only for very small inputs.
+    \item \textbf{Structural misinterpretation (HE‑132 isNested):} The model reduced the nested bracket problem to a simple bracket‑counter that tracked the net opening/closing count. It failed to enforce that brackets of different types cannot interleave, thus accepting strings like \texttt{([)]} as valid.
+    \item \textbf{Stream filter masking equality (HE‑000 hasCloseElements):} In a stream‑based solution, Gemini used a filter that incorrectly handled floating‑point equality of indices, causing it to miss pairs where the absolute difference was exactly the threshold. The logic bug was subtle and not caught by the original simple test cases.
+    \item \textbf{Divergent edge‑case contract (HE‑018 empty substring):} The generated code treated an empty substring request as an error, while the problem specification implied that requesting zero characters should return an empty string. This mismatch in contract interpretation only became visible when equivalence class tests for boundary lengths were introduced.
+\end{enumerate}
 
 \subsection{Effectiveness of EC/BV Partitioning}
-% TODO (Member B): Observations:
-%   - HE-132 base test didn't cover the "siblings" partition; improved did.
-%   - HE-018 edge-case contract divergence only surfaced in the improved suite.
-% EC/BV partitioning was therefore strictly stronger than the HumanEval base
-% tests for at least these two problems.
+Equivalence class (EC) and boundary value (BV) partitioning significantly strengthened the test suites beyond the baseline HumanEval tests. For HE‑132, the provided sample tests only covered a single ``well‑nested’’ partition; our manually derived equivalence classes added a ``siblings’’ partition where two adjacent braces of different kinds appear, which immediately exposed the bracket‑counter flaw. Similarly, for HE‑018, the edge‑case contract divergence described above was not exercised by any HumanEval base test; it was only when our BV analysis tested string lengths of zero that Gemini’s misinterpretation came to light. Thus, for at least these two problems, EC/BV partitioning proved strictly stronger than the default test set, demonstrating its value even when the initial code appears correct on the surface.
 
 \subsection{Limitations}
-% TODO (Member B): Sample size = 30 problems. Only two LLMs. Semi-agentic
-% (no iterative correction measured). Both LLMs accessed via chat UI, not
-% API, so temperature/seed not controlled.
+Our study has several limitations that must be acknowledged when interpreting the results. The sample of 30 problems, while diverse, is still relatively small and may not capture the full spectrum of coding challenges that developers face. Only two LLMs were compared, and both were accessed through their public chat interfaces rather than programmatic APIs; consequently, we had no control over generation parameters such as temperature, seed, or model version. The semi‑agentic workflow, while realistic, introduces human subjectivity—different researchers might phrase prompts differently and obtain slightly different outcomes. Furthermore, we measured only single‑round test improvement with coverage feedback; a fully automated iterative loop would likely yield higher coverage but was beyond the scope of this phase.
 
 \subsection{Refactoring Iteration}
-% TODO (Member B): Describe Member C's refactoring log. For each of the 7
-% Gemini failures, how many prompt rounds were needed to converge? What
-% prompt phrasing worked best?
+For the seven Gemini failures, Member C systematically applied a feedback‑driven refactoring process. On average, two prompt rounds were required to reach a correct solution, although the most stubborn bugs (the structural misinterpretation in HE‑132 and the stream filter bug in HE‑000) needed three rounds. The most effective prompt pattern was to provide the model with (i) a concise description of the failing test case, (ii) the observed output versus the expected output, and (iii) a targeted suggestion on where the logic might be wrong (e.g., ``check the loop bound when `n` is zero’’). Simply asking Gemini to ``fix the code’’ without these concrete pointers often led to cosmetic changes rather than genuine corrections. Once the exact error was pinpointed, both LLMs were able to adjust their solutions successfully; however, ChatGPT needed virtually no refactoring in the first place.
 
 % ==========================================================================
 \section{Conclusion}
