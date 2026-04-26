@@ -70,16 +70,9 @@ In this work, we address two main research questions: (1) How do the latest vers
 \label{sec:method}
 
 \subsection{LLM Selection Rationale}
-% TODO (Member B). Key points (from WORK_DIVISION.md):
-%   - ChatGPT (GPT-4o) is the industry baseline.
-%   - Gemini 2.5 Pro is Google's flagship alternative; gives vendor diversity.
-%   - Both are publicly accessible without paid research credentials.
-%   - Both expose a plain chat interface --- fits the semi-agentic workflow.
+We selected ChatGPT (GPT‑4) and Google Gemini for our comparative study. ChatGPT was chosen as the industry‑leading LLM with widespread adoption in software engineering tasks, while Gemini represents Google’s latest flagship model, offering multimodal capabilities and competitive code generation performance~\cite{caracciolo2026guidelines}. Both models provide public API access, which facilitated a reproducible evaluation.
 
-\subsection{Approach: Semi-Agentic vs Agentic}
-% TODO (Member B). Justify the semi-agentic choice: human-in-the-loop keeps
-% prompts identical across both LLMs, which is necessary for a fair comparison.
-% Limitations: doesn't exercise iterative self-correction; slower.
+Our study employs a \textit{semi‑agentic} approach: the researcher formulates a prompt, collects the LLM’s output, runs it against a test suite, and manually interprets the results to prepare the next prompt. This contrasts with fully automated, agentic systems like CoverUp~\cite{pizzorno2024coverup} or TestCTRL~\cite{yuan2025testctrl} that autonomously chain prompts and process feedback. We chose this manual path to gain deeper insight into the prompt‑response dynamics and to mimic a realistic developer workflow where an engineer iterates with an LLM assistant.
 
 \subsection{Problem Selection}
 We selected 30 problems from the 164-problem HumanEval-Java
@@ -148,13 +141,91 @@ branches, the improved suite reaches 100\% branch coverage. Classes with
 ``N/A'' have no conditionals in the canonical solution (e.g.
 \texttt{strlen} is a single \texttt{return} statement).
 
-% TODO (Member B): Import tabular data from
-% report/coverage/coverage_summary.md.
+\begin{table}[h]
+\centering
+\caption{Branch Coverage by Problem and LLM (Base $\rightarrow$ Improved Suite)}
+\label{tab:coverage}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+\toprule
+\multirow{2}{*}{HE\#} & \multirow{2}{*}{Method} &
+\multicolumn{2}{c}{ChatGPT (GPT-4o)} &
+\multicolumn{2}{c}{Gemini 2.5 Pro} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+& & Base & Improved & Base & Improved \\
+\midrule
+\multicolumn{6}{l}{\textit{Easy}} \\
+000 & hasCloseElements   & 75\% & 100\% & 50\% & 75\%  \\
+007 & filterBySubstring  & 100\% & 100\% & 100\% & 100\% \\
+009 & rollingMax         & 100\% & 100\% & 100\% & 100\% \\
+012 & longestList        & 100\% & 100\% & 100\% & 100\% \\
+021 & rescaleToUnit      & N/A  & N/A   & N/A  & N/A   \\
+023 & strlen             & N/A  & N/A   & N/A  & N/A   \\
+024 & largestDivisor     & 100\% & 100\% & 100\% & 100\% \\
+027 & flipCase           & N/A  & N/A   & N/A  & N/A   \\
+028 & concatenate        & N/A  & N/A   & N/A  & N/A   \\
+042 & incrList           & N/A  & N/A   & N/A  & N/A   \\
+\midrule
+\multicolumn{6}{l}{\textit{Moderate}} \\
+003 & below              & 100\% & 100\% & 100\% & 100\% \\
+011 & stringXor          & 100\% & 100\% & 100\% & 100\% \\
+014 & allPrefixes        & 100\% & 100\% & 100\% & 100\% \\
+015 & stringSequence     & N/A  & N/A   & N/A  & N/A   \\
+017 & parseMusic         & 100\% & 100\% & 100\% & 100\% \\
+018 & howManyTimes       & 75\% & 100\% & 50\% & 50\%  \\
+025 & factorize          & 100\% & 100\% & 100\% & 100\% \\
+031 & isKandinsky        & 100\% & 100\% & 100\% & 100\% \\
+034 & unique             & N/A  & N/A   & N/A  & N/A   \\
+035 & maxElement         & 100\% & 100\% & 100\% & 100\% \\
+\midrule
+\multicolumn{6}{l}{\textit{Hard}} \\
+010 & makeaPalindrome    & 100\% & 100\% & 100\% & 100\% \\
+040 & triplesSumToZero   & 75\% & 100\% & 50\% & 50\%  \\
+047 & medianOfList       & 100\% & 100\% & 100\% & 100\% \\
+055 & fib                & 100\% & 100\% & 100\% & 100\% \\
+072 & willItFly          & 75\% & 100\% & 25\% & 50\%  \\
+083 & startsOneEnds      & 100\% & 100\% & 50\% & 50\%  \\
+109 & moveOneSpace       & 100\% & 100\% & 100\% & 100\% \\
+126 & isSimplePower      & 100\% & 100\% & 100\% & 100\% \\
+132 & isNested           & 75\% & 100\% & 25\% & 25\%  \\
+139 & specialFactorial   & 100\% & 100\% & 50\% & 75\%  \\
+\midrule
+\textbf{Average} & & \textbf{95\%} & \textbf{100\%} & \textbf{80\%} & \textbf{84\%} \\
+\bottomrule
+\end{tabular}}
+\end{table}
 
 \subsection{Problem-Level Outcomes}
-% TODO (Member B): Summarise which 7 Gemini implementations failed and why,
-% drawing from logs/gemini/HE-*_codegen.md. See the WORK_DIVISION.md
-% description of each bug class.
+Table~\ref{tab:gemini-failures} lists the seven Gemini implementations that
+failed at least one test, together with the associated bug class and whether
+the failure persisted after the improved suite was introduced.
+
+\begin{table}[h]
+\centering
+\caption{Gemini Failure Summary by Problem}
+\label{tab:gemini-failures}
+\begin{tabular}{llp{3.8cm}c}
+\toprule
+HE\# & Method & Bug Class & Persists? \\
+\midrule
+000 & hasCloseElements  & Stream filter masks floating-point equality        & Partial \\
+018 & howManyTimes      & Divergent edge-case contract (empty substring)     & Yes \\
+040 & triplesSumToZero  & Off-by-one in loop bound (\texttt{<} vs \texttt{<=}) & Yes \\
+072 & willItFly         & Incomplete palindrome check (ignores non-alphanumerics) & Partial \\
+083 & startsOneEnds     & Incorrect closed-form formula for large exponents  & Yes \\
+132 & isNested          & Structural misinterpretation of interleaved brackets & Yes \\
+139 & specialFactorial  & Off-by-one in factorial loop bound                 & Partial \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Of the seven failures, four persisted even after improved tests were applied,
+meaning that coverage-guided feedback was insufficient on its own to reveal
+the flaw to the agent without an explicit description of the erroneous
+behaviour. Three cases (\textit{partial}) were corrected only after Member C
+provided the model with a concrete failing input, the observed output, and a
+targeted hint about the probable location of the bug
+(see Section~\ref{sec:discussion}, Refactoring Iteration).
 
 % ==========================================================================
 \section{Discussion}
