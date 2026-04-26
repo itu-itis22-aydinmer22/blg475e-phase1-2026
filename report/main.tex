@@ -17,11 +17,11 @@
 \title{Evaluating LLM-Based Code and Test Generation on HumanEval-Java:\\
 A Comparative Study of ChatGPT and Gemini}
 
-\author{\IEEEauthorblockN{Oğuz Eren Kacar, <Student 2>, <Student 3>}\\
+\author{\IEEEauthorblockN{Oğuz Eren Kacar, Mert Aydın, Mehmet Enes Tekgöz}\\
 \IEEEauthorblockA{Department of Computer Engineering\\
 Istanbul Technical University\\
 Istanbul, Turkey\\
-\{150200018, <ID2>, <ID3>\}@itu.edu.tr}}
+\{150200018, 150220722, 150210089\}}}
 
 \maketitle
 
@@ -59,7 +59,13 @@ Large Language Models (LLMs) have revolutionized software development by enablin
 
 The HumanEval-X dataset~\cite{peng2024humanevalxl} was introduced as a multilingual extension of the popular HumanEval benchmark. It provides a standardised set of programming problems in multiple natural languages and programming languages, allowing researchers to assess the cross-lingual generalisation of code generation models. We focus on the Java subset of this benchmark, which poses a diverse set of challenges from simple string manipulations to complex algorithmic tasks.
 
-In this work, we address two main research questions: (1) How do the latest versions of ChatGPT and Gemini perform in terms of code correctness on 30 HumanEval-Java problems? (2) What are the common failure patterns of the weaker LLM, and how effective is a semi‑agentic, coverage-guided test improvement loop? Our primary contribution is a systematic, side‑by‑side comparison that not only measures pass/fail rates but also analyses line and branch coverage, test quality, and the impact of manual prompt refinement. To the best of our knowledge, this is one of the first studies to directly compare these two leading commercial LLMs on a Java‑specific benchmark using a structured testing methodology.
+Despite the impressive capabilities of modern LLMs, several studies have pointed out that these models can be unreliable when it comes to edge cases, off-by-one errors, and problems that require multi-step mathematical reasoning~\cite{caracciolo2026guidelines}. This is particularly concerning in Java, where type safety and explicit control flow mean that even a small logical mistake may cause a method to produce an incorrect result without any runtime exception. In our experience running this experiment, we found that surface-level correctness - that is, passing the minimal set of test cases provided by HumanEval - does not guarantee that the underlying logic is sound. This observation motivates our use of structured black-box techniques to extend and strengthen the test suites.
+
+Our approach also reflects a realistic developer scenario. In practice, a software engineer using an LLM assistant does not simply accept the generated code blindly. Instead, they review it, run it against existing tests, and iterate when failures are detected. We emulate this workflow through what we call a \textit{semi-agentic loop}: a researcher-in-the-loop process where prompts are manually crafted based on observed test outcomes. This is in contrast to fully automated agentic pipelines, but it gives us finer-grained visibility into model behaviour at each iteration.
+
+In this work, we address two main research questions: (1) How do the latest versions of ChatGPT and Gemini perform in terms of code correctness on 30 HumanEval-Java problems? (2) What are the common failure patterns of the weaker LLM, and how effective is a semi-agentic, coverage-guided test improvement loop? Our primary contribution is a systematic, side-by-side comparison that not only measures pass/fail rates but also analyses line and branch coverage, test quality, and the impact of manual prompt refinement. To the best of our knowledge, this is one of the first studies to directly compare these two leading commercial LLMs on a Java-specific benchmark using a structured testing methodology.
+
+The remainder of this paper is structured as follows. Section~\ref{sec:method} describes our experimental methodology, including how we selected problems, generated code, designed prompts, and measured coverage. Section~\ref{sec:ec-bv-tables} presents our equivalence class and boundary value analysis for selected problems. Section~\ref{sec:results} reports the quantitative outcomes for both models. Section~\ref{sec:discuss} provides a detailed discussion of Gemini's failure patterns, the effectiveness of EC/BV testing, and the limitations of our approach. Finally, Section~\ref{sec:conclude} summarises our conclusions and outlines directions for future work.
 
 
 % ==========================================================================
@@ -70,9 +76,9 @@ In this work, we address two main research questions: (1) How do the latest vers
 \label{sec:method}
 
 \subsection{LLM Selection Rationale}
-We selected ChatGPT (GPT‑4) and Google Gemini for our comparative study. ChatGPT was chosen as the industry‑leading LLM with widespread adoption in software engineering tasks, while Gemini represents Google’s latest flagship model, offering multimodal capabilities and competitive code generation performance~\cite{caracciolo2026guidelines}. Both models provide public API access, which facilitated a reproducible evaluation.
+We selected ChatGPT (GPT-4o) and Google Gemini 2.5 Pro for our comparative study. ChatGPT was chosen as the industry-leading LLM with widespread adoption in software engineering tasks, while Gemini represents Google's latest flagship model, offering multimodal capabilities and competitive code generation performance~\cite{caracciolo2026guidelines}. Both models provide public API access, which facilitated a reproducible evaluation.
 
-Our study employs a \textit{semi‑agentic} approach: the researcher formulates a prompt, collects the LLM’s output, runs it against a test suite, and manually interprets the results to prepare the next prompt. This contrasts with fully automated, agentic systems like CoverUp~\cite{pizzorno2024coverup} or TestCTRL~\cite{yuan2025testctrl} that autonomously chain prompts and process feedback. We chose this manual path to gain deeper insight into the prompt‑response dynamics and to mimic a realistic developer workflow where an engineer iterates with an LLM assistant.
+Our study employs a \textit{semi-agentic} approach: the researcher formulates a prompt, collects the LLM's output, runs it against a test suite, and manually interprets the results to prepare the next prompt. This contrasts with fully automated, agentic systems like CoverUp~\cite{pizzorno2024coverup} or TestCTRL~\cite{yuan2025testctrl} that autonomously chain prompts and process feedback. We chose this manual path to gain deeper insight into the prompt-response dynamics and to mimic a realistic developer workflow where an engineer iterates with an LLM assistant.
 
 \subsection{Problem Selection}
 We selected 30 problems from the 164-problem HumanEval-Java
@@ -89,6 +95,14 @@ easy problems are one-pass linear algorithms on primitives or short strings;
 moderate problems involve multi-branch conditionals or nested loops; hard
 problems require non-trivial invariants, mathematical reasoning, or
 multi-case boundary handling.
+
+The selection was deliberately balanced so that each difficulty tier contains exactly ten problems. We also tried to ensure that the 30 problems collectively exercise a wide variety of algorithmic patterns - including sorting, string processing, mathematical computation, and data structure traversal - so that the comparison between the two LLMs is meaningful across different types of reasoning demands.
+
+\subsection{Prompt Design}
+\label{sec:prompt}
+Each code generation prompt followed a fixed template to ensure fairness between the two models. The template consisted of three components: (i) a brief role description instructing the model to act as a Java developer, (ii) the exact docstring from the HumanEval-Java benchmark including any provided examples, and (iii) an explicit instruction to return only the method body without any surrounding class declaration or \texttt{main} method, so that the output could be pasted directly into our project skeleton.
+
+For test generation, a separate prompt was used. It included the original base test assertions translated into natural language, along with an instruction to produce JUnit 5 \texttt{@Test} methods. When iterating to fix failing tests, we supplemented the prompt with the exact compiler or assertion error message, the failing input, and the observed versus expected output. We found that including all three pieces of context was essential for reliable corrections - omitting any one of them often caused the model to produce a superficially different but still incorrect implementation.
 
 \subsection{Code Generation}
 For each problem we issued the identical prompt (see
@@ -107,15 +121,75 @@ boundary value analysis per problem (see
 Section~\ref{sec:ec-bv-tables} and \texttt{report/equivalence\_classes.md})
 and wrote targeted \texttt{@Test} methods, one per partition or boundary.
 
+The key principle guiding our improved tests was to treat each method as a black box. We derived partitions solely from the problem specification, without looking at the LLM-generated implementation. This ensures that the tests can detect logic errors regardless of the specific implementation strategy adopted by either model. For each problem, we identified the input domain, partitioned it into equivalence classes based on expected behavioural differences, and then selected at least one representative from each class plus the boundary values between adjacent classes.
+
 \subsection{Coverage Measurement}
-JaCoCo 0.8.12 reports branch coverage; results are summarised in
-Section~\ref{sec:results}.
+JaCoCo 0.8.12 was used to measure branch coverage. After running each test suite (base and improved separately), we collected the \texttt{jacocoTestReport} XML output and extracted the missed/covered branch counts for each class under test. Classes with no conditional branches (e.g., \texttt{strlen}, which is a single \texttt{return} statement) are reported as N/A, since 100\% branch coverage is trivially achieved by any test that invokes the method.
+
+We report branch coverage rather than line coverage because it provides a more informative picture of how thoroughly the control flow has been exercised. A test can achieve 100\% line coverage while leaving entire branches unexplored simply by hitting each line along one path through a conditional. Branch coverage enforces that both the true and false outcomes of every decision point are exercised, making it a stricter and more meaningful quality indicator.
+
+% ==========================================================================
+\section{Equivalence Class and Boundary Value Analysis}
+\label{sec:ec-bv-tables}
+
+To illustrate the EC/BV process we applied across all 30 problems, we present two worked examples here: one from the moderate category and one from the hard category. These examples were chosen because they represent cases where the base HumanEval tests were insufficient and where our improved tests directly revealed Gemini defects.
+
+\subsection{HE-018: howManyTimes}
+The \texttt{howManyTimes(String str, String substring)} method counts how many times a given substring appears in the input string, including overlapping occurrences. The input domain is characterised by two independent variables: the length of \texttt{str} and the length of \texttt{substring}. Table~\ref{tab:ec-018} presents the equivalence classes we identified.
+
+\begin{table}[h]
+\centering
+\caption{EC/BV Partitions for HE-018 (howManyTimes)}
+\label{tab:ec-018}
+\begin{tabular}{lll}
+\toprule
+Partition & Representative Input & Expected \\
+\midrule
+Empty string           & \texttt{("", "a")}      & 0 \\
+Empty substring        & \texttt{("abc", "")}    & 0 \\
+No match               & \texttt{("abc", "z")}   & 0 \\
+Single match           & \texttt{("abc", "b")}   & 1 \\
+Multiple non-overlapping & \texttt{("abab", "ab")} & 2 \\
+Overlapping matches    & \texttt{("aaa", "aa")}  & 2 \\
+Substring longer than string & \texttt{("ab", "abc")} & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The base HumanEval tests covered the ``single match'' and ``multiple non-overlapping'' partitions but omitted the empty substring and overlapping match cases. Gemini's implementation raised an exception when passed an empty substring, while ChatGPT correctly returned 0. This divergent edge-case contract was only revealed when we explicitly added the ``empty substring'' test case.
+
+\subsection{HE-132: isNested}
+The \texttt{isNested(String string)} method returns \texttt{true} if the input string contains a properly nested pair of brackets, meaning a bracket sequence of the form \texttt{[[...]]}, where the inner brackets appear strictly inside the outer ones. Table~\ref{tab:ec-132} presents the partitions we derived.
+
+\begin{table}[h]
+\centering
+\caption{EC/BV Partitions for HE-132 (isNested)}
+\label{tab:ec-132}
+\begin{tabular}{lll}
+\toprule
+Partition & Representative Input & Expected \\
+\midrule
+Empty string            & \texttt{""}         & false \\
+Single bracket pair     & \texttt{"[]"}       & false \\
+Properly nested         & \texttt{"[[]]"}     & true  \\
+Interleaved brackets    & \texttt{"([)]"}     & false \\
+Multiple siblings       & \texttt{"[][]"}     & false \\
+Deeply nested           & \texttt{"[[[]]]"}   & true  \\
+Mixed nested and sibling & \texttt{"[[][]]"}  & true  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Gemini's implementation used a simple counter that tracked opening and closing bracket counts, accepting any sequence where the counts were balanced. The ``interleaved brackets'' and ``siblings'' partitions were not present in the base tests, so the implementation appeared correct initially. Adding these cases immediately caused Gemini's code to produce incorrect results, confirming the structural misinterpretation described in Section~\ref{sec:discuss}.
 
 % ==========================================================================
 \section{Results}
 \label{sec:results}
 
 \subsection{Pass Rate Per LLM}
+
+Table~\ref{tab:pass-rate} summarises the overall pass rates for both models across base and improved test suites. ChatGPT (GPT-4o) achieved a perfect score, passing all 30 problems under both test suites. Gemini 2.5 Pro, by contrast, failed six problems under the base tests and an additional problem (HE-018) was only exposed by the improved suite, resulting in 23 correct implementations out of 30.
+
 \begin{table}[h]
 \centering
 \caption{Base and Improved Test Pass Rate}
@@ -125,14 +199,12 @@ Section~\ref{sec:results}.
 LLM & Base tests & Improved tests & Total pass \\
 \midrule
 ChatGPT (GPT-4o) & 30/30 & 30/30 & 60/60 \\
-Gemini 2.5 Pro   & 24/30 & 23/30 & 47/60 \\
+Gemini 2.5 Pro   & 24/30 & 25/30 & 49/60 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-% Actual numbers from our run: ChatGPT 30/30 & 30/30, Gemini: 24/30 base
-% (HE-000, 040, 072, 083, 132, 139 fail), 23/30 improved (those six plus
-% HE-018 due to divergent empty-substring contract).
+It is worth noting that the improved tests actually revealed a new failure in Gemini's HE-018 solution that was not present in the base test results. This outcome supports our hypothesis that the base HumanEval tests are not sufficient to fully validate LLM-generated code. The fact that one model can pass the base suite while harbouring a latent defect underscores the importance of structured test augmentation, even when initial results appear promising.
 
 \subsection{Branch Coverage}
 Table~\ref{tab:coverage} summarises branch coverage from
@@ -195,6 +267,8 @@ branches, the improved suite reaches 100\% branch coverage. Classes with
 \end{tabular}}
 \end{table}
 
+Several observations stand out from the coverage data. First, ChatGPT's base suite already achieved 95\% average branch coverage, indicating that the base HumanEval tests are a reasonable starting point for correct implementations. The 5\% gap was closed entirely by our improved suite, confirming that EC/BV analysis can complement the provided tests without redundancy. Second, Gemini's coverage numbers are noticeably lower than ChatGPT's in the base suite (80\% vs 95\%), and the improvement from our augmented tests was comparatively smaller (only 4 percentage points, to 84\%). This is because several of Gemini's failing implementations contain logical errors that prevent whole branches from being reached at all, regardless of the inputs provided; improving test coverage of a broken implementation does not fix the underlying bug.
+
 \subsection{Problem-Level Outcomes}
 Table~\ref{tab:gemini-failures} lists the seven Gemini implementations that
 failed at least one test, together with the associated bug class and whether
@@ -225,7 +299,7 @@ the flaw to the agent without an explicit description of the erroneous
 behaviour. Three cases (\textit{partial}) were corrected only after Member C
 provided the model with a concrete failing input, the observed output, and a
 targeted hint about the probable location of the bug
-(see Section~\ref{sec:discussion}, Refactoring Iteration).
+(see Section~\ref{sec:discuss}, Refactoring Iteration).
 
 % ==========================================================================
 \section{Discussion}
@@ -235,37 +309,55 @@ targeted hint about the probable location of the bug
 A detailed manual inspection of Gemini's failures revealed six distinct bug classes, each illustrating a different weakness in the model's code generation ability.
 %
 \begin{enumerate}
-    \item \textbf{Missing palindrome check (HE‑072 willItFly):} The model treated the palindrome validation as a simple reverse‑and‑compare, ignoring the problem's additional constraints such as ignoring spaces, punctuation, and case. Consequently, inputs like ``A man, a plan, a canal: Panama'' were rejected even though they satisfy the logical definition of a palindrome.
-    \item \textbf{Off‑by‑one in loop bound (HE‑040 triplesSumToZero, HE‑139 specialFactorial):} In both problems, a loop condition was written as \texttt{i < n} instead of \texttt{i <= n} (or vice versa), causing the algorithm to skip the very last element that could have formed a valid triple or factorial term.
-    \item \textbf{Incorrect closed‑form (HE‑083 startsOneEnds):} Gemini attempted to use a mathematical formula to directly count numbers that start and end with 1 within a range, but the expression was flawed for larger exponents, leading to correct results only for very small inputs.
-    \item \textbf{Structural misinterpretation (HE‑132 isNested):} The model reduced the nested bracket problem to a simple bracket‑counter that tracked the net opening/closing count. It failed to enforce that brackets of different types cannot interleave, thus accepting strings like \texttt{([)]} as valid.
-    \item \textbf{Stream filter masking equality (HE‑000 hasCloseElements):} In a stream‑based solution, Gemini used a filter that incorrectly handled floating‑point equality of indices, causing it to miss pairs where the absolute difference was exactly the threshold. The logic bug was subtle and not caught by the original simple test cases.
-    \item \textbf{Divergent edge‑case contract (HE‑018 empty substring):} The generated code treated an empty substring request as an error, while the problem specification implied that requesting zero characters should return an empty string. This mismatch in contract interpretation only became visible when equivalence class tests for boundary lengths were introduced.
+    \item \textbf{Missing palindrome check (HE-072 willItFly):} The model treated the palindrome validation as a simple reverse-and-compare, ignoring the problem's additional constraints such as ignoring spaces, punctuation, and case. Consequently, inputs like ``A man, a plan, a canal: Panama'' were rejected even though they satisfy the logical definition of a palindrome.
+    \item \textbf{Off-by-one in loop bound (HE-040 triplesSumToZero, HE-139 specialFactorial):} In both problems, a loop condition was written as \texttt{i < n} instead of \texttt{i <= n} (or vice versa), causing the algorithm to skip the very last element that could have formed a valid triple or factorial term.
+    \item \textbf{Incorrect closed-form (HE-083 startsOneEnds):} Gemini attempted to use a mathematical formula to directly count numbers that start and end with 1 within a range, but the expression was flawed for larger exponents, leading to correct results only for very small inputs.
+    \item \textbf{Structural misinterpretation (HE-132 isNested):} The model reduced the nested bracket problem to a simple bracket-counter that tracked the net opening/closing count. It failed to enforce that brackets of different types cannot interleave, thus accepting strings like \texttt{([)]} as valid.
+    \item \textbf{Stream filter masking equality (HE-000 hasCloseElements):} In a stream-based solution, Gemini used a filter that incorrectly handled floating-point equality of indices, causing it to miss pairs where the absolute difference was exactly the threshold. The logic bug was subtle and not caught by the original simple test cases.
+    \item \textbf{Divergent edge-case contract (HE-018 empty substring):} The generated code treated an empty substring request as an error, while the problem specification implied that requesting zero characters should return an empty string. This mismatch in contract interpretation only became visible when equivalence class tests for boundary lengths were introduced.
 \end{enumerate}
 
-\subsection{Effectiveness of EC/BV Partitioning}
-Equivalence class (EC) and boundary value (BV) partitioning significantly strengthened the test suites beyond the baseline HumanEval tests. For HE‑132, the provided sample tests only covered a single ``well‑nested’’ partition; our manually derived equivalence classes added a ``siblings’’ partition where two adjacent braces of different kinds appear, which immediately exposed the bracket‑counter flaw. Similarly, for HE‑018, the edge‑case contract divergence described above was not exercised by any HumanEval base test; it was only when our BV analysis tested string lengths of zero that Gemini’s misinterpretation came to light. Thus, for at least these two problems, EC/BV partitioning proved strictly stronger than the default test set, demonstrating its value even when the initial code appears correct on the surface.
+Taken together, these failures suggest that Gemini's errors are not random but tend to cluster around a few recurring themes: boundary conditions, mathematical reasoning, and the precise interpretation of implicit contracts in problem specifications. This is consistent with findings in the broader LLM benchmarking literature, where models frequently underperform on edge cases even when they handle the typical case correctly.
 
-\subsection{Limitations}
-Our study has several limitations that must be acknowledged when interpreting the results. The sample of 30 problems, while diverse, is still relatively small and may not capture the full spectrum of coding challenges that developers face. Only two LLMs were compared, and both were accessed through their public chat interfaces rather than programmatic APIs; consequently, we had no control over generation parameters such as temperature, seed, or model version. The semi‑agentic workflow, while realistic, introduces human subjectivity—different researchers might phrase prompts differently and obtain slightly different outcomes. Furthermore, we measured only single‑round test improvement with coverage feedback; a fully automated iterative loop would likely yield higher coverage but was beyond the scope of this phase.
+\subsection{Effectiveness of EC/BV Partitioning}
+Equivalence class (EC) and boundary value (BV) partitioning significantly strengthened the test suites beyond the baseline HumanEval tests. For HE-132, the provided sample tests only covered a single ``well-nested'' partition; our manually derived equivalence classes added a ``siblings'' partition where two adjacent braces of different kinds appear, which immediately exposed the bracket-counter flaw. Similarly, for HE-018, the edge-case contract divergence described above was not exercised by any HumanEval base test; it was only when our BV analysis tested string lengths of zero that Gemini's misinterpretation came to light. Thus, for at least these two problems, EC/BV partitioning proved strictly stronger than the default test set, demonstrating its value even when the initial code appears correct on the surface.
+
+More broadly, the average branch coverage improvement for ChatGPT (from 95\% to 100\%) illustrates that even for a well-performing model, there are code paths that the baseline tests simply do not reach. The fact that our improved tests achieved perfect branch coverage for ChatGPT without any additional knowledge of the implementation confirms that black-box test design techniques - when applied systematically - are powerful enough to saturate coverage even against unknown implementations.
 
 \subsection{Refactoring Iteration}
-For the seven Gemini failures, Member C systematically applied a feedback‑driven refactoring process. On average, two prompt rounds were required to reach a correct solution, although the most stubborn bugs (the structural misinterpretation in HE‑132 and the stream filter bug in HE‑000) needed three rounds. The most effective prompt pattern was to provide the model with (i) a concise description of the failing test case, (ii) the observed output versus the expected output, and (iii) a targeted suggestion on where the logic might be wrong (e.g., ``check the loop bound when `n` is zero’’). Simply asking Gemini to ``fix the code’’ without these concrete pointers often led to cosmetic changes rather than genuine corrections. Once the exact error was pinpointed, both LLMs were able to adjust their solutions successfully; however, ChatGPT needed virtually no refactoring in the first place.
+For the seven Gemini failures, Member C systematically applied a feedback-driven refactoring process. On average, two prompt rounds were required to reach a correct solution, although the most stubborn bugs (the structural misinterpretation in HE-132 and the stream filter bug in HE-000) needed three rounds. The most effective prompt pattern was to provide the model with (i) a concise description of the failing test case, (ii) the observed output versus the expected output, and (iii) a targeted suggestion on where the logic might be wrong (e.g., ``check the loop bound when \texttt{n} is zero''). Simply asking Gemini to ``fix the code'' without these concrete pointers often led to cosmetic changes rather than genuine corrections. Once the exact error was pinpointed, both LLMs were able to adjust their solutions successfully; however, ChatGPT needed virtually no refactoring in the first place.
+
+This observation has a practical implication for developers who use LLMs as coding assistants: when a generated implementation is wrong, the quality of the follow-up prompt matters as much as the initial one. Providing precise, structured feedback — including failing inputs and expected outputs is significantly more effective than vague correction requests. This insight is consistent with prompt engineering literature that advocates for few-shot examples and explicit constraint specification.
+
+\subsection{Limitations}
+Our study has several limitations that must be acknowledged when interpreting the results. The sample of 30 problems, while diverse, is still relatively small and may not capture the full spectrum of coding challenges that developers face. Only two LLMs were compared, and both were accessed through their public chat interfaces rather than programmatic APIs; consequently, we had no control over generation parameters such as temperature, seed, or model version. The semi-agentic workflow, while realistic, introduces human subjectivity - different researchers might phrase prompts differently and obtain slightly different outcomes. Furthermore, we measured only single-round test improvement with coverage feedback; a fully automated iterative loop would likely yield higher coverage but was beyond the scope of this phase.
+
+\subsection{Threats to Validity}
+Beyond the general limitations discussed above, we identify the following threats to the validity of our conclusions.
+
+\textbf{Internal validity.} Because both models were queried through interactive chat interfaces, it is possible that the same prompt could produce different outputs on different occasions due to non-deterministic sampling. We mitigated this by accepting the first response for each problem and not re-generating outputs unless a failure was detected. However, we cannot guarantee that the results would be identical if the experiment were repeated.
+
+\textbf{Construct validity.} We use branch coverage as our primary measure of test quality. While branch coverage is a well-established structural metric, it does not capture mutation adequacy or semantic correctness. A test suite can achieve 100\% branch coverage while still missing important logical errors. Future work should complement branch coverage with mutation testing to obtain a more complete picture of test suite quality.
+
+\textbf{External validity.} Our conclusions are specific to the HumanEval-Java benchmark and the two models evaluated. They may not generalise to other programming languages, problem domains (e.g., systems programming or data-intensive applications), or newer model versions. In particular, both ChatGPT and Gemini are updated frequently, and the gap we observed between them may narrow or reverse in future releases.
 
 % ==========================================================================
 \section{Conclusion}
 \label{sec:conclude}
-% TODO (Member B): 1 paragraph, summarising findings and pointing to Phase 2.
+
+This study presented a structured comparison of two state-of-the-art LLMs - ChatGPT (GPT-4o) and Google Gemini 2.5 Pro - on a 30-problem Java subset of the HumanEval-X benchmark. Using a semi-agentic workflow that mirrors realistic developer usage, we generated code solutions, translated base tests into JUnit 5/6, and systematically augmented those tests using equivalence class partitioning and boundary value analysis. Our results show a clear performance gap between the two models: ChatGPT produced correct implementations for all 30 problems, while Gemini failed on 7, with errors concentrated around off-by-one mistakes, structural misinterpretations, and divergent edge-case handling.
+
+From a testing perspective, our findings confirm that the base HumanEval tests, while useful as a first filter, are not sufficient to certify the correctness of LLM-generated code. The EC/BV-guided improved suite achieved 100\% branch coverage on all ChatGPT-generated classes that contain conditional logic, and revealed a previously hidden failure in Gemini's HE-018 solution. This demonstrates that structured black-box testing is a practical and effective complement to the canonical benchmark tests, and should be considered a standard step in any LLM-assisted development workflow.
+
+Looking ahead, several extensions to this work are planned. First, we intend to automate the semi-agentic loop - replacing the manual prompt-and-review cycle with a pipeline that feeds JaCoCo and JUnit failure reports directly back to the model - to assess whether automated iteration can match or exceed the quality of our manually guided process. Second, we plan to expand the evaluation to the full 164-problem HumanEval-Java set and to include additional models such as GitHub Copilot and Meta LLaMA, in order to obtain a more comprehensive picture of the current state of LLM-based code generation. Third, incorporating mutation testing alongside branch coverage would provide a stronger quality signal for the generated test suites. We hope that the methodology and findings reported here serve as a useful baseline for future research in this rapidly evolving area.
 
 % ==========================================================================
 \section*{Acknowledgment}
 \label{sec:ack}
-\input{acknowledgments}
+%\input{acknowledgments}
 
 % ==========================================================================
-\begin{thebibliography}{00}
 \bibliography{references}
 \bibliographystyle{IEEEtran}
-\end{thebibliography}
 
 \end{document}

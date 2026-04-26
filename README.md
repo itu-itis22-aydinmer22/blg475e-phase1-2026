@@ -11,7 +11,7 @@ _To be filled in before submission._
 | Name | Student ID | Phase-1 responsibility (see `WORK_DIVISION.md`) |
 |------|-----------|-------------------------------------------------|
 | Mert Aydın | ITU-XXXXXX | Member A — Infrastructure, code & test generation pipeline |
-| <Name 2> | <ID 2> | Member B — Literature review & IEEE report |
+| Oğuz Eren Kacar | 150200018 | Member B — Literature review & IEEE report |
 | <Name 3> | <ID 3> | Member C — Coverage analysis, refactoring, QA |
 
 ## What this project is
@@ -41,8 +41,8 @@ limitations are discussed in the report.
 | Improved tests w/ EC + BV partitioning (60 files) | ✅ `*ImprovedTest.java` |
 | LLM interaction logs (120 files) | ✅ `logs/chatgpt/`, `logs/gemini/` |
 | JaCoCo branch-coverage reports | ✅ `report/coverage/` |
-| IEEE LaTeX report (≥ 6 pages) | 🟡 Skeleton in `report/main.tex` — Member B finishes |
-| Literature review (5 papers, past 3 years) | ❌ Member B |
+| IEEE LaTeX report (≥ 6 pages) | ✅ `report/main.tex` |
+| Literature review (5 papers, past 3 years) | ✅ `report/literature_review.tex` |
 | Manual EC/BV tables (per problem) | 🟡 Auto-seeded in `report/equivalence_classes.md`, Member C reviews |
 | Refactoring (fix Gemini bugs, re-run) | ❌ Member C |
 | Final commit/push hygiene + acknowledgments | ❌ Member C |
