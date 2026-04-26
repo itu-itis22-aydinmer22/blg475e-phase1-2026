@@ -1,3 +1,7 @@
+﻿# @Authors
+# Student Names: Oğuz Eren Kacar, Mert Aydın, Mehmet Enes Tekgöz
+# Student IDs: 150200018, 150220722, 150210089
+
 """
 Alternative Gemini-style implementations for the 30 selected HumanEval problems.
 

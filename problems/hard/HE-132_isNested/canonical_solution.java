@@ -1,3 +1,8 @@
+﻿/* @Authors
+* Student Names: Oğuz Eren Kacar, Mert Aydın, Mehmet Enes Tekgöz
+* Student IDs: 150200018, 150220722, 150210089
+*/
+
         List<Integer> opening_bracket_index = new ArrayList<>(), closing_bracket_index = new ArrayList<>();
         for (int i = 0; i < string.length(); i++) {
             if (string.charAt(i) == '[') {
