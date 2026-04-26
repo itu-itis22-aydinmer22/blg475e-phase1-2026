@@ -28,11 +28,24 @@ public class HE132_isNested {
      *     isNested("[[]][[") -> true
      */
     public boolean isNested(String string) {
-        int open = 0, close = 0;
+        int depth = 0;
+        boolean innerClosed = false;
+        
         for (char c : string.toCharArray()) {
-            if (c == '[') open++;
-            else if (c == ']') close++;
+            if (c == '[') {
+                depth++;
+            } else if (c == ']') {
+                if (innerClosed && depth > 0) {
+                    return true;
+                }
+                if (depth >= 2) {
+                    innerClosed = true;
+                }
+                if (depth > 0) {
+                    depth--;
+                }
+            }
         }
-        return open > 1 && close > 1;
+        return false;
     }
 }
