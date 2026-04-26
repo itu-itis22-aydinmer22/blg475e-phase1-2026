@@ -1,27 +1,15 @@
 \documentclass[journal]{IEEEtran}
 
-% --- Packages ---
+% Packages
+\usepackage{cite}
 \usepackage{graphicx}
-\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsmath}
 \usepackage{algorithmic}
-\usepackage{textcomp}
-\usepackage{xcolor}
-\usepackage{listings}
+\usepackage{array}
 \usepackage{url}
+\usepackage{hyperref}
 \usepackage{booktabs}
 \usepackage{multirow}
-\usepackage{array}
-\usepackage{hyperref}
-
-\lstset{
-  basicstyle=\ttfamily\footnotesize,
-  breaklines=true,
-  frame=single,
-  captionpos=b,
-  showstringspaces=false,
-  numbers=left,
-  numberstyle=\tiny\color{gray}
-}
 
 \begin{document}
 
@@ -29,32 +17,33 @@
 \title{Evaluating LLM-Based Code and Test Generation on HumanEval-Java:\\
 A Comparative Study of ChatGPT and Gemini}
 
-\author{\IEEEauthorblockN{<Student 1>, <Student 2>, <Student 3>}\\
+\author{\IEEEauthorblockN{Oğuz Eren Kacar, <Student 2>, <Student 3>}\\
 \IEEEauthorblockA{Department of Computer Engineering\\
 Istanbul Technical University\\
 Istanbul, Turkey\\
-\{<ID1>, <ID2>, <ID3>\}@itu.edu.tr}}
+\{150200018, <ID2>, <ID3>\}@itu.edu.tr}}
 
 \maketitle
 
 % ==========================================================================
 \begin{abstract}
-% TODO (Member B): 150--200 words. Motivate the study, name the two LLMs,
-% describe the 30-problem HumanEval-Java subset, summarise that ChatGPT passed
-% 30/30 and Gemini passed 23/30, and finally state that improved EC/BV tests
-% reached 100\% branch coverage on all branchful ChatGPT classes.
-We evaluate two pre-trained large language models (LLMs) --- OpenAI ChatGPT
-(GPT-4o) and Google Gemini 2.5 Pro --- on a 30-problem subset of the
-HumanEval-Java benchmark. Using a semi-agentic workflow we generate Java
-solutions, convert HumanEval base tests to JUnit 5/6, and author improved
-tests driven by equivalence class partitioning and boundary value analysis.
-We measure correctness using the base and improved suites and branch coverage
-using JaCoCo. ChatGPT produced implementations that passed all 60 of our
-ChatGPT-targeted tests; Gemini produced 23/30 implementations that passed
-every test and 7/30 that diverged from canonical behaviour in ways captured
-by our improved test suite. We discuss the nature of the deviations, assess
-the effectiveness of EC/BV partitioning as a diagnostic, and report branch
-coverage of 122/122 across all ChatGPT classes with conditional branches.
+The rapid adoption of large language models (LLMs) in software development
+makes it essential to rigorously validate the code they produce. This study
+evaluates two state-of-the-art LLMs OpenAI ChatGPT (GPT-4o) and Google
+Gemini 2.5 Pro on a carefully selected 30-problem subset of the
+HumanEval-Java benchmark, spanning easy, moderate, and hard difficulty levels.
+Using a semi-agentic workflow, we prompt each model to generate Java solutions,
+transliterate the provided HumanEval base tests into JUnit~5/6, and then
+systematically improve those tests through equivalence class partitioning and
+boundary value analysis. Correctness is measured by pass/fail outcomes;
+structural quality is assessed via JaCoCo branch coverage. ChatGPT (GPT-4o)
+produced correct implementations for all 30 problems, while Gemini 2.5 Pro
+succeeded on only 23 of 30, with failures attributable to off-by-one errors,
+structural misinterpretations, and divergent edge-case contracts. Applying our
+improved EC/BV-guided test suite achieved 100\% branch coverage across every
+ChatGPT-generated class that contains conditional branches, demonstrating that
+systematic black-box analysis substantially strengthens LLM-generated test
+suites beyond the baseline.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -64,9 +53,14 @@ equivalence class partitioning, boundary value analysis.
 
 % ==========================================================================
 \section{Introduction}
-% TODO (Member B): ~0.5 page. Paraphrase the assignment motivation: LLMs can
-% generate code and tests; correctness must be verified; this study does
-% exactly that for Java / HumanEval.
+\label{sec:intro}
+
+Large Language Models (LLMs) have revolutionized software development by enabling developers to generate code from natural language descriptions. Tools like ChatGPT and Gemini can automatically produce executable code, significantly accelerating prototyping and reducing development time~\cite{yuan2025testctrl}. However, the correctness and quality of LLM-generated code remain critical concerns that necessitate rigorous testing.
+
+The HumanEval-X dataset~\cite{peng2024humanevalxl} was introduced as a multilingual extension of the popular HumanEval benchmark. It provides a standardised set of programming problems in multiple natural languages and programming languages, allowing researchers to assess the cross-lingual generalisation of code generation models. We focus on the Java subset of this benchmark, which poses a diverse set of challenges from simple string manipulations to complex algorithmic tasks.
+
+In this work, we address two main research questions: (1) How do the latest versions of ChatGPT and Gemini perform in terms of code correctness on 30 HumanEval-Java problems? (2) What are the common failure patterns of the weaker LLM, and how effective is a semi‑agentic, coverage-guided test improvement loop? Our primary contribution is a systematic, side‑by‑side comparison that not only measures pass/fail rates but also analyses line and branch coverage, test quality, and the impact of manual prompt refinement. To the best of our knowledge, this is one of the first studies to directly compare these two leading commercial LLMs on a Java‑specific benchmark using a structured testing methodology.
+
 
 % ==========================================================================
 \section{Related Work}
