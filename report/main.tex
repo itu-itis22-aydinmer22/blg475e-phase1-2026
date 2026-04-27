@@ -215,54 +215,51 @@ branches, the improved suite reaches 100\% branch coverage. Classes with
 
 \begin{table}[h]
 \centering
-\caption{Branch Coverage by Problem and LLM (Base $\rightarrow$ Improved Suite)}
+\caption{Branch Coverage by Problem and LLM (Improved Test Suite)}
 \label{tab:coverage}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{llcccc}
+\begin{tabular}{llcc}
 \toprule
-\multirow{2}{*}{HE\#} & \multirow{2}{*}{Method} &
-\multicolumn{2}{c}{ChatGPT (GPT-4o)} &
-\multicolumn{2}{c}{Gemini 2.5 Pro} \\
-\cmidrule(lr){3-4}\cmidrule(lr){5-6}
-& & Base & Improved & Base & Improved \\
+HE\# & Method & ChatGPT (GPT-4o) & Gemini 2.5 Pro \\
 \midrule
-\multicolumn{6}{l}{\textit{Easy}} \\
-000 & hasCloseElements   & 75\% & 100\% & 50\% & 75\%  \\
-007 & filterBySubstring  & 100\% & 100\% & 100\% & 100\% \\
-009 & rollingMax         & 100\% & 100\% & 100\% & 100\% \\
-012 & longestList        & 100\% & 100\% & 100\% & 100\% \\
-021 & rescaleToUnit      & N/A  & N/A   & N/A  & N/A   \\
-023 & strlen             & N/A  & N/A   & N/A  & N/A   \\
-024 & largestDivisor     & 100\% & 100\% & 100\% & 100\% \\
-027 & flipCase           & N/A  & N/A   & N/A  & N/A   \\
-028 & concatenate        & N/A  & N/A   & N/A  & N/A   \\
-042 & incrList           & N/A  & N/A   & N/A  & N/A   \\
+\multicolumn{4}{l}{\textit{Easy}} \\
+000 & hasCloseElements   & 100\% & 100\% \\
+007 & filterBySubstring  & 100\% & 100\% \\
+009 & rollingMax         & 100\% & 100\% \\
+012 & longest            & 100\% & 100\% \\
+021 & rescaleToUnit      & 100\% & N/A   \\
+023 & strlen             & N/A   & N/A   \\
+024 & largestDivisor     & 100\% & 100\% \\
+027 & flipCase           & 100\% & 100\% \\
+028 & concatenate        & N/A   & N/A   \\
+042 & incrList           & N/A   & N/A   \\
 \midrule
-\multicolumn{6}{l}{\textit{Moderate}} \\
-003 & below              & 100\% & 100\% & 100\% & 100\% \\
-011 & stringXor          & 100\% & 100\% & 100\% & 100\% \\
-014 & allPrefixes        & 100\% & 100\% & 100\% & 100\% \\
-015 & stringSequence     & N/A  & N/A   & N/A  & N/A   \\
-017 & parseMusic         & 100\% & 100\% & 100\% & 100\% \\
-018 & howManyTimes       & 75\% & 100\% & 50\% & 50\%  \\
-025 & factorize          & 100\% & 100\% & 100\% & 100\% \\
-031 & isKandinsky        & 100\% & 100\% & 100\% & 100\% \\
-034 & unique             & N/A  & N/A   & N/A  & N/A   \\
-035 & maxElement         & 100\% & 100\% & 100\% & 100\% \\
+\multicolumn{4}{l}{\textit{Moderate}} \\
+003 & belowZero          & 100\% & 100\% \\
+011 & stringXor          & 100\% & 100\% \\
+014 & allPrefixes        & 100\% & 100\% \\
+015 & stringSequence     & 100\% & N/A   \\
+017 & parseMusic         & 100\% & 87.5\% \\
+018 & howManyTimes       & 100\% & 100\% \\
+025 & factorize          & 100\% & 100\% \\
+031 & isPrime            & 100\% & 100\% \\
+034 & unique             & N/A   & N/A   \\
+035 & maxElement         & N/A   & N/A   \\
 \midrule
-\multicolumn{6}{l}{\textit{Hard}} \\
-010 & makeaPalindrome    & 100\% & 100\% & 100\% & 100\% \\
-040 & triplesSumToZero   & 75\% & 100\% & 50\% & 50\%  \\
-047 & medianOfList       & 100\% & 100\% & 100\% & 100\% \\
-055 & fib                & 100\% & 100\% & 100\% & 100\% \\
-072 & willItFly          & 75\% & 100\% & 25\% & 50\%  \\
-083 & startsOneEnds      & 100\% & 100\% & 50\% & 50\%  \\
-109 & moveOneSpace       & 100\% & 100\% & 100\% & 100\% \\
-126 & isSimplePower      & 100\% & 100\% & 100\% & 100\% \\
-132 & isNested           & 75\% & 100\% & 25\% & 25\%  \\
-139 & specialFactorial   & 100\% & 100\% & 50\% & 75\%  \\
+\multicolumn{4}{l}{\textit{Hard}} \\
+010 & isPalindrome       & 100\% & 83.3\% \\
+040 & triplesSumToZero   & 100\% & 100\% \\
+047 & median             & 100\% & 100\% \\
+055 & fib                & 100\% & 100\% \\
+072 & willItFly          & 100\% & 100\% \\
+083 & startsOneEnds      & 100\% & 100\% \\
+109 & moveOneBall        & 100\% & 100\% \\
+126 & isSorted           & 100\% & 100\% \\
+132 & isNested           & 100\% & 90.0\% \\
+139 & specialFactorial   & 100\% & 100\% \\
 \midrule
-\textbf{Average} & & \textbf{95\%} & \textbf{100\%} & \textbf{80\%} & \textbf{84\%} \\
+\textbf{Total (branching classes)} &
+  & \textbf{212/212 (100\%)} & \textbf{120/124 (96.8\%)} \\
 \bottomrule
 \end{tabular}}
 \end{table}
