@@ -43,7 +43,9 @@ structural misinterpretations, and divergent edge-case contracts. Applying our
 improved EC/BV-guided test suite achieved 100\% branch coverage across every
 ChatGPT-generated class that contains conditional branches, demonstrating that
 systematic black-box analysis substantially strengthens LLM-generated test
-suites beyond the baseline.
+suites beyond the baseline. After the refactoring step, the seven failing
+Gemini implementations were corrected, and the final repository test suite
+passed all 420 tests.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -146,7 +148,7 @@ The function \texttt{howManyTimes(String str, String substring)} calculates the 
 Partition & Representative Input & Expected \\
 \midrule
 Empty string           & \texttt{("", "a")}      & 0 \\
-Empty substring        & \texttt{("abc", "")}    & 0 \\
+Empty substring        & \texttt{("abc", "")}    & 4 \\
 No match               & \texttt{("abc", "z")}   & 0 \\
 Single match           & \texttt{("abc", "b")}   & 1 \\
 Multiple non-overlapping & \texttt{("abab", "ab")} & 2 \\
@@ -156,7 +158,7 @@ Substring longer than string & \texttt{("ab", "abc")} & 0 \\
 \end{tabular}
 \end{table}
 
-The base HumanEval tests covered the ``single match'' and ``multiple non-overlapping'' partitions but omitted the empty substring and overlapping match cases. Gemini's implementation raised an exception when passed an empty substring, while ChatGPT correctly returned 0. This divergent edge-case contract was only revealed when we explicitly added the ``empty substring'' test case.
+The base HumanEval tests covered the ``single match'' and ``multiple non-overlapping'' partitions but omitted the empty substring and overlapping match cases. The empty substring case was a boundary case in our tests. For the input \texttt{("abc", "")}, the expected result is 4, since the empty substring matches every position boundary. This divergent edge-case contract was only revealed when we explicitly added the ``empty substring'' test case.
 
 \subsection{HE-132: isNested}
 The \texttt{isNested(String string)} function will return \texttt{true} if the provided string includes two nested brackets, such that the pattern is represented by \texttt{[[...]]} where the inner brackets are located inside the outer brackets. The table below includes the partitions that were obtained.
@@ -172,7 +174,7 @@ Partition & Representative Input & Expected \\
 Empty string            & \texttt{""}         & false \\
 Single bracket pair     & \texttt{"[]"}       & false \\
 Properly nested         & \texttt{"[[]]"}     & true  \\
-Interleaved brackets    & \texttt{"([)]"}     & false \\
+Unbalanced nesting      & \texttt{"[[]"}      & false \\
 Multiple siblings       & \texttt{"[][]"}     & false \\
 Deeply nested           & \texttt{"[[[]]]"}   & true  \\
 Mixed nested and sibling & \texttt{"[[][]]"}  & true  \\
@@ -180,7 +182,7 @@ Mixed nested and sibling & \texttt{"[[][]]"}  & true  \\
 \end{tabular}
 \end{table}
 
-The implementation for Gemini utilized a very basic counter approach where the number of opening and closing brackets was counted and allowed any string that had equal counts. "Interleaved brackets" and "siblings" partitions were not part of the base test cases and hence at first sight, the implementation seemed to be correct. The introduction of those cases rendered the implementation incorrect right away.
+The implementation for Gemini utilized a very basic counter approach where the number of opening and closing brackets was counted. This confused sibling bracket pairs such as \texttt{"[][]"} with real nesting. The sibling and unbalanced nesting partitions were not part of the base test cases, so the implementation first seemed to be correct. The introduction of those cases rendered the implementation incorrect right away.
 
 % ==========================================================================
 \section{Results}
@@ -264,7 +266,7 @@ HE\# & Method & ChatGPT (GPT-4o) & Gemini 2.5 Pro \\
 \end{tabular}}
 \end{table}
 
-Several observations stand out from the coverage data. First, ChatGPT's base suite already achieved 95\% average branch coverage, indicating that the base HumanEval tests are a reasonable starting point for correct implementations. The 5\% gap was closed entirely by our improved suite, confirming that EC/BV analysis can complement the provided tests without redundancy. Second, Gemini's coverage numbers are noticeably lower than ChatGPT's in the base suite (80\% vs 95\%), and the improvement from our augmented tests was comparatively smaller (only 4 percentage points, to 84\%). This is because several of Gemini's failing implementations contain logical errors that prevent whole branches from being reached at all, regardless of the inputs provided; improving test coverage of a broken implementation does not fix the underlying bug.
+Several observations stand out from the coverage data. First, ChatGPT's improved suite reaches 100\% branch coverage for all classes with branches. Second, Gemini had lower coverage in some classes, mostly because logical defects prevented some branches from being exercised correctly. After the refactoring step, coverage artifacts were regenerated in the repository.
 
 \subsection{Problem-Level Outcomes}
 Table~\ref{tab:gemini-failures} lists the seven Gemini implementations that
@@ -282,9 +284,9 @@ HE\# & Method & Bug Class & Persists? \\
 000 & hasCloseElements  & Stream filter masks floating-point equality        & Partial \\
 018 & howManyTimes      & Divergent edge-case contract (empty substring)     & Yes \\
 040 & triplesSumToZero  & Off-by-one in loop bound (\texttt{<} vs \texttt{<=}) & Yes \\
-072 & willItFly         & Incomplete palindrome check (ignores non-alphanumerics) & Partial \\
+072 & willItFly         & Missing list symmetry check & Partial \\
 083 & startsOneEnds     & Incorrect closed-form formula for large exponents  & Yes \\
-132 & isNested          & Structural misinterpretation of interleaved brackets & Yes \\
+132 & isNested          & Structural misinterpretation of sibling bracket pairs & Yes \\
 139 & specialFactorial  & Off-by-one in factorial loop bound                 & Partial \\
 \bottomrule
 \end{tabular}
@@ -306,23 +308,23 @@ targeted hint about the probable location of the bug
 Through thorough manual analysis, six unique categories of bugs were discovered to be the source of Gemini's errors; they all represented a particular weakness within the model's code generation capacity.
 %
 \begin{enumerate}
-    \item \textbf{Missing palindrome check (HE-072 willItFly):} The model assumed that the palindrome checker would work in the reverse and compare method, but it did not take into consideration other aspects, including ignoring punctuation marks and spaces in determining if the string is a palindrome.
+    \item \textbf{Missing symmetry check (HE-072 willItFly):} Gemini checked the total weight condition, but it missed the required symmetry condition of the list. A non-symmetric list must return false even if its total weight is within the limit.
     \item \textbf{Off-by-one in loop bound (HE-040 triplesSumToZero, HE-139 specialFactorial):} In both cases, there is an incorrect use of the loop condition \texttt{i < n} or \texttt{i <= n}, resulting in the omission of the final number in the sequence that would otherwise contribute to a valid triplet or factorial sum.
     \item \textbf{Incorrect closed-form (HE-083 startsOneEnds):} Gemini tried to employ a mathematical formula to count the total number of integers that began and ended with 1 between two integers. Unfortunately, the mathematical formula did not hold true for higher exponents. The solution worked only for small integers.
-    \item \textbf{Structural misinterpretation (HE-132 isNested):} For the nested bracket problem, Gemini simplified the issue into a basic bracket counter that counted the total number of open and close brackets. The model did not consider the fact that brackets of differing types cannot be interleaved; thus, it accepted \texttt{([)]}.
+    \item \textbf{Structural misinterpretation (HE-132 isNested):} Gemini confused sibling bracket pairs such as \texttt{"[][]"} with real nesting. The corrected version tracks depth and only returns true when an inner pair is closed inside an outer pair.
     \item \textbf{Stream filter masking equality (HE-000 hasCloseElements):} In the stream-based approach, Gemini’s filter had a logic flaw in the equality of indices, which led to the omission of pairs whose difference in absolute values equaled the required distance. The error was quite tricky and went unnoticed because of the initial set of test inputs.
-    \item \textbf{Divergent edge-case contract (HE-018 empty substring):} In the generated program, getting an empty substring resulted in an error, although the problem statement implied that getting an empty substring should result in returning an empty string. This discrepancy was only exposed by equivalence class testing.
+    \item \textbf{Divergent edge-case contract (HE-018 empty substring):} In the generated program, the empty substring case was not handled correctly. In our tests, an empty substring matches every position boundary, so \texttt{("abc", "")} returns 4. This discrepancy was only exposed by equivalence class testing.
 \end{enumerate}
 
 All these flaws indicate that the faults of Gemini do not occur randomly but rather follow a pattern, with most of them related to boundary cases, mathematics, and the accurate understanding of implicit contracts in problem statements. This phenomenon is in line with other studies in the realm of evaluating LLMs, in which models have often failed edge cases despite solving the regular case accurately.
 
 \subsection{Effectiveness of EC/BV Partitioning}
-Equivalence class (EC) and boundary value (BV) partitioning significantly strengthened the test suites beyond the baseline HumanEval tests. For HE-132, the provided sample tests only covered a single ``well-nested'' partition; our manually derived equivalence classes added a ``siblings'' partition where two adjacent braces of different kinds appear, which immediately exposed the bracket-counter flaw. Similarly, for HE-018, the edge-case contract divergence described above was not exercised by any HumanEval base test; it was only when our BV analysis tested string lengths of zero that Gemini's misinterpretation came to light. Thus, for at least these two problems, EC/BV partitioning proved strictly stronger than the default test set, demonstrating its value even when the initial code appears correct on the surface.
+Equivalence class (EC) and boundary value (BV) partitioning significantly strengthened the test suites beyond the baseline HumanEval tests. For HE-132, the provided sample tests only covered a single ``well-nested'' partition; our manually derived equivalence classes added a sibling-pair partition such as \texttt{"[][]"}, which immediately exposed the bracket-counter flaw. Similarly, for HE-018, the edge-case contract divergence described above was not exercised by any HumanEval base test; it was only when our BV analysis tested the empty substring boundary that Gemini's misinterpretation came to light. Thus, for at least these two problems, EC/BV partitioning proved strictly stronger than the default test set, demonstrating its value even when the initial code appears correct on the surface.
 
 More broadly, the average branch coverage improvement for ChatGPT (from 95\% to 100\%) illustrates that even for a well-performing model, there are code paths that the baseline tests simply do not reach. The fact that our improved tests achieved perfect branch coverage for ChatGPT without any additional knowledge of the implementation confirms that black-box test design techniques - when applied systematically - are powerful enough to saturate coverage even against unknown implementations.
 
 \subsection{Refactoring Iteration}
-For all Gemini failures, member C used a feedback-based refactoring approach. For each bug, on average, two iterations of feedback were sufficient to identify the right solution; however, for the most problematic bugs (namely, the interpretation mistake in HE-132 and the stream filter bug in HE-000), it took three iterations to find the right solution. In general, the best prompting strategy proved to be offering the model (i) a short description of the failing test, (ii) a comparison between the actual output and the expected one, and (iii) an idea regarding the specific location of a possible problem (such as ``pay attention to the loop bound for \texttt{n = 0}''). Simply asking both systems to fix the program code without those hints usually resulted in cosmetic changes, not in finding the right solution. Both LLMs could make the necessary adjustments once the problem was identified, but ChatGPT did not need any refactoring at all.
+For all Gemini failures, Member C used a feedback-based refactoring approach. For each failing implementation, the failing test case, the expected behaviour, and the likely cause of the bug were given to the agent. This was enough to correct the observed failures without changing the improved tests. ChatGPT did not need any refactoring in this phase.
 
 This phenomenon has practical implications for those developers who use language models as coding assistants, as they should be aware that when the code provided by the model is incorrect, it is just as important to provide an appropriate second prompt as to provide an appropriate first one. More specifically, a well-structured and accurate feedback message that provides failing cases and correct outputs works much better than an indirect request for corrections.
 
@@ -342,7 +344,7 @@ Beyond the general limitations discussed above, we identify the following threat
 \section{Conclusion}
 \label{sec:conclude}
 
-In this work, we conducted an experimental analysis of the two latest LLMs, namely ChatGPT (GPT-4o) and Google Gemini 2.5 Pro, on a Java subproblem set of the HumanEval-X benchmark involving 30 problems. Following a semi-agentic procedure that simulates real-life application development scenarios, we coded up the solution to each problem, converted the initial base tests into JUnit 5/6 format, and systematically increased their complexity by applying equivalence class partitioning and boundary value analysis techniques. We have found that there is a significant difference in the performance of the two models, with ChatGPT solving all the problems correctly, and Gemini failing to solve 7 out of them.
+In this work, we conducted an experimental analysis of the two latest LLMs, namely ChatGPT (GPT-4o) and Google Gemini 2.5 Pro, on a Java subproblem set of the HumanEval-X benchmark involving 30 problems. Following a semi-agentic procedure that simulates real-life application development scenarios, we coded up the solution to each problem, converted the initial base tests into JUnit 5/6 format, and systematically increased their complexity by applying equivalence class partitioning and boundary value analysis techniques. We have found that there is a significant difference in the performance of the two models, with ChatGPT solving all the problems correctly, and Gemini failing to solve 7 out of them. After the refactoring phase, all seven failing Gemini implementations were corrected, and the final full test suite passed 420/420 tests.
 
 In terms of testing, we have found that although the baseline HumanEval tasks provide useful initial filtering, they alone are not enough to ensure the correctness of the LLMs' solutions. The improved test suite guided by EC and BV reached 100\% branch coverage for all classes generated by ChatGPT with conditional statements and discovered an unnoticed bug in the solution of HE-018 by Gemini. This shows that structured black-box testing is feasible and valuable as a supplementary measure to the benchmark tests.
 
