@@ -30,8 +30,8 @@ TEST_DIR = ROOT / "src" / "test" / "java" / "edu" / "itu" / "blg475e"
 LOG_DIR = ROOT / "logs"
 
 AUTHORS_HEADER = """/* @Authors
- * Student Names: <Student 1>, <Student 2>, <Student 3>
- * Student IDs:   <ID 1>, <ID 2>, <ID 3>
+ * Student Names: Mert Aydın, Oğuz Eren Kacar, Mehmet Enes Tekgöz
+ * Student IDs:   150220722, 150200018, 150210089
  *
  * BLG 475E Software Quality and Testing - 2025-2026 Spring Term
  * Project: LLM-Based Code and Test Generation

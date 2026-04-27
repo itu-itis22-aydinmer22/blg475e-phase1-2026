@@ -11,11 +11,11 @@ Design philosophy:
   especially in recursion/boundary conditions.
 - Some solutions are intentionally the SAME as canonical (correct).
 - A subset (~6-8) have realistic bugs that real LLMs often produce:
-  * HE-010 isPalindrome: Gemini often forgets empty string edge
+  * HE-000 hasCloseElements: stream boundary mishandling
+  * HE-018 howManyTimes: missing overlap counting
   * HE-040 triplesSumToZero: off-by-one boundary
   * HE-072 willItFly: missing balanced check
   * HE-083 startsOneEnds: wrong formula
-  * HE-109 moveOneBall: incorrect rotation check
   * HE-132 isNested: wrong pairing logic
   * HE-139 specialFactorial: off-by-one accumulation
 
@@ -216,4 +216,4 @@ GEMINI_BODIES = {
 
 
 # These are the "buggy" ones we expect tests to catch
-GEMINI_BUGGY = {10, 40, 72, 83, 109, 132, 139}
+GEMINI_BUGGY = {0, 18, 40, 72, 83, 132, 139}
