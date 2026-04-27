@@ -1,9 +1,7 @@
 /* @Authors
- * Student Names: Mert Aydın, Oğuz Eren Kacar, Mehmet Enes Tekgöz
- * Student IDs:   150220722, 150200018, 150210089
- *
- * BLG 475E Software Quality and Testing - 2025-2026 Spring Term
- * Project: LLM-Based Code and Test Generation
+ * Mert Aydın - 150220722
+ * Oğuz Eren Kacar - 150200018
+ * Mehmet Enes Tekgöz - 150210089
  */
 package edu.itu.blg475e.gemini;
 

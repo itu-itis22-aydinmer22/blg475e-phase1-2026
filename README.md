@@ -6,11 +6,11 @@ Due date: **27 April 2026**
 
 ## Group members
 
-| Name | Student ID | Phase-1 responsibility |
-|------|-----------|------------------------|
+| Name | Student ID | Phase-1 responsibility (see `WORK_DIVISION.md`) |
+|------|-----------|-------------------------------------------------|
 | Mert Aydın | 150220722 | Member A — Infrastructure, code & test generation pipeline |
 | Oğuz Eren Kacar | 150200018 | Member B — Literature review & IEEE report |
-| Mehmet Enes Tekgöz | 150210089 | Member C — Refactoring, coverage analysis |
+| Mehmet Enes Tekgöz | 150210089 | Member C — Coverage analysis, refactoring, QA |
 
 ## What this project is
 
@@ -42,8 +42,8 @@ limitations are discussed in the report.
 | IEEE LaTeX report (≥ 6 pages) | ✅ `report/main.tex` |
 | Literature review (5 papers, past 3 years) | ✅ `report/literature_review.tex` |
 | Manual EC/BV tables (per problem) | ✅ `report/equivalence_classes.md` |
-| Refactoring (fix 7 divergent Gemini bugs) | ✅ Member C — see `Step 6: …` commits |
-| Final commit/push hygiene + acknowledgments | ✅ |
+| Refactoring (fix Gemini bugs, re-run) | ✅ `src/main/java/edu/itu/blg475e/gemini/`, `logs/gemini/` |
+| Final commit/push hygiene + acknowledgments | ✅ `report/acknowledgments.tex`, PR #1 |
 
 ## Test results (latest run)
 
@@ -51,23 +51,14 @@ limitations are discussed in the report.
 ./gradlew clean test
 → 420 tests, 420 pass, 0 fail
   - ChatGPT:  30/30 problems pass all tests
-  - Gemini:   30/30 after refactoring (7 originally divergent implementations
-              corrected via the assignment's Refactoring step)
+  - Gemini:   30/30 problems pass all tests after Member C refactoring
 ```
 
-The 7 originally divergent Gemini implementations (HE-000, 018, 040, 072,
-083, 132, 139) were caught by the improved EC/BV test suite, then taken
-through the **Refactoring** step: each one was re-prompted with the failing
-test, the corrected code accepted, the suite re-run, and the fix committed as
-its own step (`Step 6: Refactored Gemini HE-XXX …`). All 60 ChatGPT and 60
-Gemini tests now pass on the final pipeline.
+The 7 Gemini divergences (HE-000, HE-018, HE-040, HE-072, HE-083, HE-132, HE-139) were fixed during the Refactoring step. Each fix was committed separately with an explanatory message, and the corresponding Gemini interaction logs were updated with the prompt, agent response, and usage note. After refactoring, the full test suite passes.
 
 ## Coverage
 
-Branch coverage on the ChatGPT implementations reached **122/122 = 100%**
-across all classes that have conditional branches (five classes have none —
-e.g. `strlen` is a single line `return string.length();`). Full per-class
-table is in [`report/coverage/coverage_summary.md`](report/coverage/coverage_summary.md).
+Branch coverage reports were regenerated after Member C refactoring. The consolidated per-class coverage table is available in `report/coverage/coverage_summary.md`. The final validation run included clean test execution, JaCoCo report generation, and coverage summary regeneration.
 
 ## Layout
 
@@ -114,10 +105,10 @@ Java 17+ toolchain and Gradle 9.0+ are required.
 
 ## Submission checklist
 
-- [ ] Names & IDs filled in at the top of this README **and** in every source file header
-- [ ] Group split documented in `report/acknowledgments.tex`
+- [x] Names & IDs filled in at the top of this README **and** in every source file header
+- [x] Group split documented in `report/acknowledgments.tex`
 - [ ] IEEE PDF built from `report/main.tex`, ≥ 6 pages
 - [ ] 5 papers (last 3 years) cited in literature review
 - [ ] GitHub repo URL added to the report's acknowledgments section
-- [ ] All tests pass after refactoring
+- [x] All tests pass after refactoring
 - [ ] Submit PDF via Ninova before 27 Apr 2026
