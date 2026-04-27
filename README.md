@@ -102,13 +102,3 @@ python3 scripts/build_coverage_summary.py    # rebuild the coverage markdown
 ```
 
 Java 17+ toolchain and Gradle 9.0+ are required.
-
-## Submission checklist
-
-- [x] Names & IDs filled in at the top of this README **and** in every source file header
-- [x] Group split documented in `report/acknowledgments.tex`
-- [ ] IEEE PDF built from `report/main.tex`, ≥ 6 pages
-- [ ] 5 papers (last 3 years) cited in literature review
-- [ ] GitHub repo URL added to the report's acknowledgments section
-- [x] All tests pass after refactoring
-- [ ] Submit PDF via Ninova before 27 Apr 2026
