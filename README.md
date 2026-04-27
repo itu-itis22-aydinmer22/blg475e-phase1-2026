@@ -6,11 +6,11 @@ Due date: **27 April 2026**
 
 ## Group members
 
-| Name | Student ID | Phase-1 responsibility (see `WORK_DIVISION.md`) |
-|------|-----------|-------------------------------------------------|
+| Name | Student ID | Phase-1 responsibility |
+|------|-----------|------------------------|
 | Mert Aydın | 150220722 | Member A — Infrastructure, code & test generation pipeline |
 | Oğuz Eren Kacar | 150200018 | Member B — Literature review & IEEE report |
-| Mehmet Enes Tekgöz | 150210089 | Member C — Coverage analysis, refactoring, QA |
+| Mehmet Enes Tekgöz | 150210089 | Member C — Refactoring, coverage analysis |
 
 ## What this project is
 
