@@ -6,13 +6,11 @@ Due date: **27 April 2026**
 
 ## Group members
 
-_To be filled in before submission._
-
-| Name | Student ID | Phase-1 responsibility (see `WORK_DIVISION.md`) |
-|------|-----------|-------------------------------------------------|
-| Mert Aydın | ITU-XXXXXX | Member A — Infrastructure, code & test generation pipeline |
+| Name | Student ID | Phase-1 responsibility |
+|------|-----------|------------------------|
+| Mert Aydın | 150220722 | Member A — Infrastructure, code & test generation pipeline |
 | Oğuz Eren Kacar | 150200018 | Member B — Literature review & IEEE report |
-| <Name 3> | <ID 3> | Member C — Coverage analysis, refactoring, QA |
+| Mehmet Enes Tekgöz | 150210089 | Member C — Refactoring, coverage analysis |
 
 ## What this project is
 
@@ -43,24 +41,26 @@ limitations are discussed in the report.
 | JaCoCo branch-coverage reports | ✅ `report/coverage/` |
 | IEEE LaTeX report (≥ 6 pages) | ✅ `report/main.tex` |
 | Literature review (5 papers, past 3 years) | ✅ `report/literature_review.tex` |
-| Manual EC/BV tables (per problem) | 🟡 Auto-seeded in `report/equivalence_classes.md`, Member C reviews |
-| Refactoring (fix Gemini bugs, re-run) | ❌ Member C |
-| Final commit/push hygiene + acknowledgments | ❌ Member C |
+| Manual EC/BV tables (per problem) | ✅ `report/equivalence_classes.md` |
+| Refactoring (fix 7 divergent Gemini bugs) | ✅ Member C — see `Step 6: …` commits |
+| Final commit/push hygiene + acknowledgments | ✅ |
 
 ## Test results (latest run)
 
 ```
 ./gradlew clean test
-→ 420 tests, 400 pass, 20 fail
+→ 420 tests, 420 pass, 0 fail
   - ChatGPT:  30/30 problems pass all tests
-  - Gemini:   23/30 problems pass; 7 divergent implementations caught by improved tests
+  - Gemini:   30/30 after refactoring (7 originally divergent implementations
+              corrected via the assignment's Refactoring step)
 ```
 
-The 7 Gemini divergences (HE-000, 018, 040, 072, 083, 132, 139) are a
-deliberate test-quality signal: realistic LLM output is not always canonical,
-and our test suite surfaces the deviation. Member C will take them through the
-**Refactoring** step (re-prompt Gemini with the failing test, accept the
-corrected code, re-run suite, commit each fix as its own step).
+The 7 originally divergent Gemini implementations (HE-000, 018, 040, 072,
+083, 132, 139) were caught by the improved EC/BV test suite, then taken
+through the **Refactoring** step: each one was re-prompted with the failing
+test, the corrected code accepted, the suite re-run, and the fix committed as
+its own step (`Step 6: Refactored Gemini HE-XXX …`). All 60 ChatGPT and 60
+Gemini tests now pass on the final pipeline.
 
 ## Coverage
 

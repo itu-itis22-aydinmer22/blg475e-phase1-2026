@@ -36,7 +36,7 @@ Our test improvement step, similar to CoverUp, uses coverage reports to generate
 % Paper 5: Prompt Engineering Guidelines
 \subsection{Empirical Guidelines for Code Generation Prompts}
 
-Caracciolo and colleagues~\cite{caracciolo2026guidelines}, systematically investigated how the quality of prompts used when generating code from LLMs affects the outcome.
+Midolo and colleagues~\cite{midolo2026guidelines}, systematically investigated how the quality of prompts used when generating code from LLMs affects the outcome.
 
 By experimenting with different prompt patterns (in terms of specificity, instance insertion, context richness, etc.), they observed that certain prompt patterns significantly improved code correctness.
 They also highlighted the differences between prompt engineering and model fine-tuning, demonstrating that a well-designed prompt is sufficient in most practical scenarios.
@@ -49,4 +49,4 @@ The five studies above offer complementary perspectives on LLM-based test genera
 
 TestCTRL and CoverUp highlight the idea of iterative improvement, while Meta's ACH system combines industrial-scale mutation testing with LLM; we apply a limited subset of these techniques in a semi-agent manner by performing an in-depth comparison on 30 HumanEval problems.
 
-HumanEval-XL emphasizes the importance of multilingual benchmarking and forms the basis of our Java-focused evaluation; Caracciolo et al.'s requests engineering guide helps us select the correct requests structure in our manual iterations.
+HumanEval-XL emphasizes the importance of multilingual benchmarking and forms the basis of our Java-focused evaluation; Midolo et al.'s prompt engineering guide helps us select the correct prompt structure in our manual iterations.
