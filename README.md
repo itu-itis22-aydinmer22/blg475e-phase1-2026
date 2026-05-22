@@ -102,3 +102,32 @@ python3 scripts/build_coverage_summary.py    # rebuild the coverage markdown
 ```
 
 Java 17+ toolchain and Gradle 9.0+ are required.
+
+
+## Phase 2 status at-a-glance
+
+| Deliverable | Status |
+|-------------|--------|
+| BookScanChatGPT.java (integrates HE-018, 023, 027) | ✅ `src/main/java/edu/itu/blg475e/phase2/` |
+| BookScanGemini.java (integrates HE-018, 023, 027) | ✅ `src/main/java/edu/itu/blg475e/phase2/` |
+| Integration tests (46 tests, IT-01..IT-05) | ✅ `src/test/java/edu/itu/blg475e/phase2/BookScanIntegrationTest.java` |
+| LLM interaction logs (code gen + test gen) | ✅ `logs/phase2/` |
+| Prompt comparison analysis | ✅ `logs/phase2/prompt_comparison_analysis.md` |
+| EC/BV analysis table for BookScan | ❌ Member B |
+| JaCoCo coverage report for BookScan | ❌ Member B |
+| Phase 2 analysis section in report | ❌ Member C |
+| Combined final report (≥ 8 pages) | ❌ Member C |
+
+### Phase 2 integration test results (latest)
+
+```
+BookScanIntegrationTest:
+  HE-023 strlen unit:               6/6 pass
+  HE-018 howManyTimes unit:         7/7 pass  (1 documented Gemini divergence)
+  HE-027 flipCase unit:             7/7 pass
+  IT-01 countWordsOfLength:         8/8 pass
+  IT-02/03 linesContainingWords:    7/7 pass
+  IT-04 scanByWordLength:           5/5 pass
+  IT-05 end-to-end passage:         6/6 pass
+  Total: 46/46 pass
+```
