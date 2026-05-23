@@ -102,18 +102,18 @@ class BookScanIntegrationTest {
             assertEquals(0, chatGpt.howManyTimes("", "abc"));
         }
 
-        // Divergence test: ChatGPT vs Gemini on empty needle
-        @Test @DisplayName("IT-HE018-EmptySubstring: ChatGPT returns 0 for empty needle")
+        // Empty substring behavior test: both agents return string.length() + 1
+        @Test @DisplayName("IT-HE018-EmptySubstring: ChatGPT returns length+1 for empty needle")
         void emptNeedle_chatgpt() {
-            assertEquals(0, chatGpt.howManyTimes("abc", ""),
-                    "ChatGPT: empty substring should return 0");
+            assertEquals(4, chatGpt.howManyTimes("abc", ""),
+                    "ChatGPT: howManyTimes with empty substring returns length+1");
         }
 
-        @Test @DisplayName("IT-HE018-EmptySubstring: Gemini diverges — returns length+1 for empty needle")
+        @Test @DisplayName("IT-HE018-EmptySubstring: Gemini returns length+1 for empty needle")
         void emptyNeedle_gemini() {
-            // Gemini-specific divergence: returns string.length() + 1 instead of 0
+            // Gemini returns string.length() + 1 for an empty substring
             assertEquals(4, gemini.howManyTimes("abc", ""),
-                    "Gemini divergence: howManyTimes with empty substring returns length+1");
+                    "Gemini: howManyTimes with empty substring returns length+1");
         }
 
         @Test @DisplayName("non-empty needle: ChatGPT and Gemini agree")
@@ -122,6 +122,11 @@ class BookScanIntegrationTest {
                 chatGpt.howManyTimes("banana", "an"),
                 gemini.howManyTimes("banana", "an")
             );
+        }
+
+        @Test @DisplayName("phase2_Coverage_substringLongerThanString")
+        void phase2_Coverage_substringLongerThanString() {
+            assertEquals(0, gemini.howManyTimes("ab", "abc"));
         }
     }
 
@@ -263,6 +268,12 @@ class BookScanIntegrationTest {
         void invalidLen() {
             assertThrows(IllegalArgumentException.class,
                     () -> chatGpt.linesContainingWordsOfLength("text", 0));
+        }
+
+        @Test @DisplayName("phase2_Coverage_invalidLenGemini")
+        void phase2_Coverage_invalidLenGemini() {
+            assertThrows(IllegalArgumentException.class,
+                    () -> gemini.linesContainingWordsOfLength("text", 0));
         }
 
         @Test @DisplayName("ChatGPT and Gemini return same lines for non-empty words")
